@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VOID OS | Value Oriented Infrastructure Design</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome for high-tech icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Supabase client JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            void: {
+              black: '#08070d',
+              dark: '#0e0c15',
+              card: '#161424',
+              accent: '#8b5cf6',
+              cyan: '#06b6d4',
+              purple: '#a855f7',
+              blue: '#3b82f6',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Premium cyber glow effects */
+    .glow-purple {
+      box-shadow: 0 0 25px -5px rgba(168, 85, 247, 0.4);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.4);
+    }
+    .text-glow {
+      text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+    }
+    .text-glow-cyan {
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+    }
+    /* Diagonal grid lines background */
+    .grid-bg {
+      background-size: 40px 40px;
+      background-image: linear-gradient(0deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+    }
+    .dark .grid-bg {
+      background-image: linear-gradient(0deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #8b5cf6;
+      border-radius: 10px;
+    }
+    /* Touch target support */
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-void-black dark:text-slate-100 font-sans antialiased grid-bg transition-colors duration-300">
+
+  <!-- COOL SPLASH SCREEN (BOOT SEQUENCE) -->
+  <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050409] transition-all duration-1000 px-4">
+    <div class="relative flex flex-col items-center w-full max-w-sm">
+      <!-- High fidelity animated SVG V-Emblem Logo (7613.png replica) -->
+      <div class="relative w-40 h-40 animate-pulse">
+        <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_0_25px_rgba(168,85,247,0.7)]">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#a855f7" />
+              <stop offset="50%" stop-color="#6366f1" />
+              <stop offset="100%" stop-color="#06b6d4" />
+            </linearGradient>
+          </defs>
+          <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M 100,20 A 80,80 0 0,0 25,75" fill="none" stroke="url(#logoGrad)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M 25,125 A 80,80 0 0,0 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M 175,125 A 80,80 0 0,1 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M 30,75 L 100,165 L 170,75 L 132,75 L 100,125 L 68,75 Z" fill="url(#logoGrad)" />
+        </svg>
+      </div>
+
+      <div class="mt-8 font-mono text-sm tracking-widest text-void-purple uppercase text-glow animate-pulse">
+        Initializing VOID OS...
+      </div>
+      
+      <!-- Tech Terminal Boot Output -->
+      <div class="mt-4 font-mono text-[10px] text-zinc-500 w-full h-24 overflow-hidden px-4 py-2 bg-black/40 rounded-lg border border-zinc-800">
+        <div id="boot-logs" class="space-y-1"></div>
+      </div>
+
+      <button onclick="skipSplash()" class="mt-6 px-6 py-2 border border-purple-500/30 hover:border-purple-500 text-xs text-zinc-400 hover:text-white rounded-full transition-all bg-purple-950/10 hover:bg-purple-950/30">
+        Skip Boot <i class="fa-solid fa-angles-right ml-1"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="sticky top-0 z-40 backdrop-blur-md border-b border-slate-200/60 dark:border-zinc-800/40 py-3 md:py-4 px-4 md:px-6 transition-colors">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-3">
+        <div class="w-10 h-10">
+          <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]">
+            <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" stroke-width="12"/>
+            <path d="M 100,20 A 80,80 0 0,0 25,75" fill="none" stroke="url(#logoGrad)" stroke-width="12"/>
+            <path d="M 25,125 A 80,80 0 0,0 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="12"/>
+            <path d="M 175,125 A 80,80 0 0,1 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="12"/>
+            <path d="M 30,75 L 100,165 L 170,75 L 132,75 L 100,125 L 68,75 Z" fill="url(#logoGrad)"/>
+          </svg>
+        </div>
+        <div>
+          <span class="font-bold text-lg tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-void-purple to-void-cyan font-mono">VOID OS</span>
+          <span class="hidden sm:block text-[8px] tracking-widest text-zinc-500 font-mono uppercase">Value Oriented Infrastructure Design</span>
+        </div>
+      </a>
+
+      <!-- Controls & CTA -->
+      <div class="flex items-center gap-3 md:gap-4">
+        <!-- MODE TOGGLE PILL (Consumer / Developer) -->
+        <div class="bg-slate-200/80 dark:bg-zinc-900/90 p-1 rounded-full border border-slate-300 dark:border-zinc-800 flex items-center shadow-inner">
+          <button id="mode-btn-consumer" onclick="setMode('consumer')" class="px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-mono font-bold transition-all flex items-center gap-1.5 bg-void-purple text-white shadow-sm">
+            <i class="fa-solid fa-user"></i> <span class="hidden sm:inline">Consumer</span>
+          </button>
+          <button id="mode-btn-developer" onclick="setMode('developer')" class="px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-mono font-bold text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-code"></i> <span class="hidden sm:inline">Developer</span>
+          </button>
+        </div>
+
+        <button id="theme-toggle" onclick="toggleTheme()" class="p-2.5 rounded-full border border-slate-300 dark:border-zinc-800/80 hover:border-purple-500/50 transition-all text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-black/10 touch-target flex items-center justify-center">
+          <i id="theme-icon" class="fa-solid fa-moon"></i>
+        </button>
+        <a href="#waitlist-section" class="px-4 py-2 md:px-5 md:py-2.5 rounded-full font-semibold text-xs tracking-wider uppercase transition-all bg-gradient-to-r from-void-purple to-void-blue text-white glow-purple hover:scale-105 active:scale-95 text-center">
+          Join Lab
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- POST-SPLASH ROLE SELECTION MODAL -->
+  <div id="role-selection-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-500">
+    <div class="bg-slate-50 dark:bg-[#100f1a] w-full max-w-xl rounded-3xl border border-purple-500/30 p-6 md:p-8 relative shadow-2xl text-center">
+      <div class="w-16 h-16 mx-auto mb-4">
+        <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]">
+          <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" stroke-width="14"/>
+          <path d="M 100,20 A 80,80 0 0,0 25,75" fill="none" stroke="url(#logoGrad)" stroke-width="14"/>
+          <path d="M 25,125 A 80,80 0 0,0 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="14"/>
+          <path d="M 175,125 A 80,80 0 0,1 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="14"/>
+          <path d="M 30,75 L 100,165 L 170,75 L 132,75 L 100,125 L 68,75 Z" fill="url(#logoGrad)"/>
+        </svg>
+      </div>
+
+      <span class="text-[10px] font-mono tracking-widest text-void-cyan uppercase font-bold">Welcome to VOID OS</span>
+      <h2 class="text-2xl md:text-3xl font-black font-mono mt-1 text-slate-900 dark:text-white">How will you use VOID OS?</h2>
+      <p class="text-slate-600 dark:text-zinc-400 text-xs md:text-sm mt-2 max-w-md mx-auto">Select your perspective so we can tailor the system overview and pricing to your needs.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <!-- Consumer Choice -->
+        <button onclick="chooseInitialRole('consumer')" class="group p-5 rounded-2xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-void-card/60 hover:border-void-purple hover:bg-purple-500/10 text-left transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-void-purple flex items-center justify-center mb-3 text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-user-astronaut"></i>
+            </div>
+            <h3 class="font-bold font-mono text-base text-slate-900 dark:text-white group-hover:text-void-purple">Consumer / Power User</h3>
+            <p class="text-[11px] text-slate-500 dark:text-zinc-400 mt-2 leading-relaxed">I want a ready-to-use, turnkey Gamified Life OS app to organize my daily habits, stats, and ops.</p>
+          </div>
+          <span class="mt-4 text-xs font-mono font-bold text-void-purple flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            Launch Consumer View <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+
+        <!-- Developer Choice -->
+        <button onclick="chooseInitialRole('developer')" class="group p-5 rounded-2xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-void-card/60 hover:border-void-cyan hover:bg-cyan-500/10 text-left transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-void-cyan flex items-center justify-center mb-3 text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-code-branch"></i>
+            </div>
+            <h3 class="font-bold font-mono text-base text-slate-900 dark:text-white group-hover:text-void-cyan">Developer / Self-Hoster</h3>
+            <p class="text-[11px] text-slate-500 dark:text-zinc-400 mt-2 leading-relaxed">I want full source code, self-hosting scripts, data sovereignty, and developer build pass details.</p>
+          </div>
+          <span class="mt-4 text-xs font-mono font-bold text-void-cyan flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            Launch Developer View <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+      </div>
+
+      <!-- Not sure button -->
+      <button onclick="chooseInitialRole('notsure')" class="mt-6 text-xs font-mono text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white underline decoration-dotted transition-all">
+        🤔 Not sure yet! Show me both.
+      </button>
+    </div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="max-w-7xl mx-auto px-4 md:px-6 pt-12 md:pt-16 pb-12 text-center relative">
+    <div class="absolute inset-0 -z-10 flex items-center justify-center opacity-10">
+      <div class="w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-void-purple rounded-full blur-[80px] md:blur-[120px] animate-pulse"></div>
+    </div>
+
+    <!-- Dynamic Mode Indicator Banner -->
+    <div id="hero-badge" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-void-purple/30 bg-void-purple/5 text-xs text-void-purple text-glow mb-6 font-mono">
+      <span class="w-2 h-2 rounded-full bg-void-cyan animate-ping"></span>
+      <span id="hero-badge-text">CONSUMER MODE: READY-TO-USE GAMIFIED LIFE OS</span>
+    </div>
+
+    <h1 id="hero-title" class="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight font-mono leading-tight max-w-4xl mx-auto text-slate-900 dark:text-white">
+      The Gamified Life OS <br/>
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-void-purple via-indigo-500 to-void-cyan">You Deploy & Own.</span>
+    </h1>
+
+    <p id="hero-subtitle" class="mt-6 text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+      Ditch expensive subscription habit-trackers. VOID OS is a turnkey life productivity ecosystem offering absolute data sovereignty and gamified progress loops directly tied to your daily actions.
+    </p>
+
+    <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto sm:max-w-none">
+      <a href="#simulator-section" class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-void-purple to-void-blue text-white hover:opacity-95 transition-all text-center glow-purple">
+        Play with Simulator <i class="fa-solid fa-gamepad ml-2"></i>
+      </a>
+      <a id="hero-secondary-cta" href="#pricing-section" class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm border border-slate-300 dark:border-zinc-800 hover:border-purple-500/40 text-slate-800 dark:text-zinc-300 hover:text-slate-950 dark:hover:text-white transition-all text-center bg-slate-100 dark:bg-zinc-950/20">
+        View SaaS Plans <i class="fa-solid fa-tags ml-2"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- DEVELOPER EXCLUSIVE ARCHITECTURE & TECH SPECS (ONLY VISIBLE IN DEV MODE) -->
+  <section id="dev-specs-section" class="hidden max-w-7xl mx-auto px-4 md:px-6 py-8 relative">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl border border-cyan-500/30 p-6 md:p-8 shadow-2xl font-mono">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-4 mb-6">
+        <div>
+          <span class="text-[10px] text-void-cyan uppercase tracking-widest font-bold">SELF-HOSTED ARCHITECTURE</span>
+          <h3 class="text-xl md:text-2xl font-bold text-white">VOID OS System Architecture</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 rounded-md bg-cyan-950 text-cyan-400 text-xs border border-cyan-800">Supabase RLS</span>
+          <span class="px-2.5 py-1 rounded-md bg-purple-950 text-purple-400 text-xs border border-purple-800">Next.js App Router</span>
+          <span class="px-2.5 py-1 rounded-md bg-zinc-800 text-zinc-300 text-xs">Vercel / Pi Deployable</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-black/40 p-4 rounded-xl border border-zinc-800">
+          <h4 class="text-xs font-bold text-void-purple mb-2"><i class="fa-solid fa-database mr-1"></i> Data Sovereignty</h4>
+          <p class="text-[11px] text-zinc-400 leading-relaxed">Full PostgreSQL database schemas with strict Row Level Security (RLS). Export or migrate your habit logs and stats to local storage anytime.</p>
+        </div>
+        <div class="bg-black/40 p-4 rounded-xl border border-zinc-800">
+          <h4 class="text-xs font-bold text-void-cyan mb-2"><i class="fa-solid fa-cubes mr-1"></i> Modular Plugin Engine</h4>
+          <p class="text-[11px] text-zinc-400 leading-relaxed">Plug-and-play modules: Battle Board, Daily Ops, Therapy Vault, and RepurposeIt built using typed TypeScript contracts.</p>
+        </div>
+        <div class="bg-black/40 p-4 rounded-xl border border-zinc-800">
+          <h4 class="text-xs font-bold text-yellow-400 mb-2"><i class="fa-solid fa-terminal mr-1"></i> Developer Devlogs</h4>
+          <p class="text-[11px] text-zinc-400 leading-relaxed">Get immediate code commit access, raw source code packages, and weekly behind-the-scenes video build logs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE PLAYABLE SIMULATOR WIDGET -->
+  <section id="simulator-section" class="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 relative">
+    <div class="text-center mb-8">
+      <h2 class="text-2xl md:text-3xl font-bold font-mono text-slate-900 dark:text-white">Live App Sandbox</h2>
+      <p class="text-slate-500 dark:text-zinc-500 mt-2 text-xs md:text-sm">Experience the Daily Ops (left) and Battle Board (right) modular simulator. Click tasks to award XP, increase levels, and morph your Stats Radar.</p>
+    </div>
+
+    <!-- Dynamic Simulation Frame -->
+    <div class="bg-white dark:bg-[#100f1a] rounded-2xl border border-slate-200 dark:border-zinc-800/80 p-4 md:p-6 shadow-2xl relative overflow-hidden transition-colors">
+      
+      <!-- Split Modular Simulator View -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- COLUMN A: DAILY OPS (Unified Radar Stats Integration) -->
+        <div class="lg:col-span-6 flex flex-col gap-6">
+          <div class="bg-slate-50 dark:bg-void-black/40 border border-slate-200 dark:border-zinc-800/60 p-5 rounded-2xl relative min-h-[520px] flex flex-col justify-between transition-colors">
+            
+            <div>
+              <div class="flex items-center justify-between">
+                <!-- Custom Square Emblem Logo Container -->
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 bg-white dark:bg-void-card/80 border border-slate-200 dark:border-zinc-800 p-2 rounded-xl flex items-center justify-center shadow-md">
+                    <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_0_4px_rgba(168,85,247,0.5)]">
+                      <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" stroke-width="16"/>
+                      <path d="M 100,20 A 80,80 0 0,0 25,75" fill="none" stroke="url(#logoGrad)" stroke-width="16"/>
+                      <path d="M 25,125 A 80,80 0 0,0 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="16"/>
+                      <path d="M 175,125 A 80,80 0 0,1 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="16"/>
+                      <path d="M 30,75 L 100,165 L 170,75 L 132,75 L 100,125 L 68,75 Z" fill="url(#logoGrad)"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <span class="text-[10px] uppercase font-mono tracking-wider text-zinc-500 font-bold">DAVE</span>
+                    <h3 class="text-2xl font-black tracking-widest font-mono text-slate-900 dark:text-white">DAILY OPS</h3>
+                    <span class="text-[10px] font-mono text-void-cyan font-bold block mt-0.5">MONDAY, JULY 20, 2026</span>
+                  </div>
+                </div>
+                
+                <!-- Metrics badges -->
+                <div class="flex items-center gap-1.5">
+                  <div class="flex flex-col items-center bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 rounded-lg">
+                    <span class="text-[8px] font-mono text-purple-400 uppercase tracking-widest">Tasks</span>
+                    <span class="text-xs font-bold font-mono text-purple-300" id="ops-count">1</span>
+                  </div>
+                  <div class="flex flex-col items-center bg-teal-950/20 dark:bg-teal-900/10 border border-teal-500/20 px-2.5 py-1 rounded-lg">
+                    <span class="text-[8px] font-mono text-teal-500 uppercase tracking-widest">Streak</span>
+                    <span class="text-xs font-bold font-mono text-teal-400" id="ops-streak">1</span>
+                  </div>
+                  <div class="flex flex-col items-center bg-yellow-500/10 border border-yellow-500/20 px-2.5 py-1 rounded-lg">
+                    <span class="text-[8px] font-mono text-yellow-500 uppercase tracking-widest">Level</span>
+                    <span class="text-xs font-bold font-mono text-yellow-400" id="ops-level">19</span>
+                  </div>
+                  <div class="flex flex-col items-center bg-pink-500/10 border border-pink-500/20 px-2.5 py-1 rounded-lg">
+                    <span class="text-[8px] font-mono text-pink-500 uppercase tracking-widest">Faith</span>
+                    <span class="text-xs font-bold font-mono text-pink-400" id="ops-faith">15%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- XP Status Bar -->
+              <div class="mt-4">
+                <div class="flex justify-between text-[10px] font-mono text-zinc-500 dark:text-zinc-400 mb-1">
+                  <span id="ops-rank">INKOWL SCRIBE</span>
+                  <span><span id="ops-xp">56</span> / 159 XP</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-zinc-800 rounded-full h-1.5">
+                  <div id="ops-xp-bar" class="bg-gradient-to-r from-void-purple to-void-cyan h-1.5 rounded-full transition-all duration-500" style="width: 35%"></div>
+                </div>
+              </div>
+
+              <!-- Radar Stats Polygon Section -->
+              <div class="mt-6 p-4 border border-slate-200 dark:border-zinc-800/60 bg-white dark:bg-[#110f1c] rounded-xl flex flex-col items-center transition-all">
+                <div class="relative w-44 h-44">
+                  <svg viewBox="0 0 200 200" class="w-full h-full">
+                    <polygon points="100,20 169,60 169,140 100,180 31,140 31,60" fill="none" stroke="rgba(124, 58, 237, 0.1)" stroke-width="1"/>
+                    <polygon points="100,50 148,77 148,131 100,158 52,131 52,77" fill="none" stroke="rgba(124, 58, 237, 0.1)" stroke-width="1"/>
+                    <polygon points="100,80 126,95 126,125 100,140 74,125 74,95" fill="none" stroke="rgba(124, 58, 237, 0.1)" stroke-width="1"/>
+                    <line x1="100" y1="20" x2="100" y2="180" stroke="rgba(124, 58, 237, 0.15)" stroke-width="1"/>
+                    <line x1="31" y1="60" x2="169" y2="140" stroke="rgba(124, 58, 237, 0.15)" stroke-width="1"/>
+                    <line x1="31" y1="140" x2="169" y2="60" stroke="rgba(124, 58, 237, 0.15)" stroke-width="1"/>
+                    
+                    <text x="100" y="14" fill="#a855f7" font-size="8" font-family="monospace" text-anchor="middle" font-weight="bold">SPIRITUAL</text>
+                    <text x="175" y="60" fill="#ec4899" font-size="8" font-family="monospace" font-weight="bold">LOVE</text>
+                    <text x="175" y="145" fill="#eab308" font-size="8" font-family="monospace" font-weight="bold">WORK</text>
+                    <text x="100" y="192" fill="#3b82f6" font-size="8" font-family="monospace" text-anchor="middle" font-weight="bold">FOCUS</text>
+                    <text x="23" y="145" fill="#06b6d4" font-size="8" font-family="monospace" text-anchor="end" font-weight="bold">MIND</text>
+                    <text x="23" y="60" fill="#22c55e" font-size="8" font-family="monospace" text-anchor="end" font-weight="bold">STRENGTH</text>
+
+                    <polygon id="radar-poly" points="100,60 141,85 131,120 100,130 65,110 52,70" fill="rgba(139, 92, 246, 0.25)" stroke="#a855f7" stroke-width="2"/>
+                    
+                    <circle id="node-spiritual" cx="100" cy="60" r="3.5" fill="#a855f7" class="transition-all duration-300"/>
+                    <circle id="node-love" cx="141" cy="85" r="3.5" fill="#ec4899" class="transition-all duration-300"/>
+                    <circle id="node-work" cx="131" cy="120" r="3.5" fill="#eab308" class="transition-all duration-300"/>
+                    <circle id="node-focus" cx="100" cy="130" r="3.5" fill="#3b82f6" class="transition-all duration-300"/>
+                    <circle id="node-mind" cx="65" cy="110" r="3.5" fill="#06b6d4" class="transition-all duration-300"/>
+                    <circle id="node-strength" cx="52" cy="70" r="3.5" fill="#22c55e" class="transition-all duration-300"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Overdue Alert Bar -->
+              <div class="flex items-center gap-1.5 text-pink-500 font-mono text-[9px] tracking-widest uppercase mt-4">
+                <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> OVERDUE
+              </div>
+
+              <!-- Task List container -->
+              <div class="mt-2 space-y-3" id="ops-task-list">
+                <!-- Prepopulated initial card matching 7622.jpg -->
+                <div class="border border-pink-500/20 bg-pink-500/5 p-4 rounded-xl flex items-start gap-3 relative transition-all duration-300" id="task-card-ascentai">
+                  <input type="checkbox" onchange="completeOpsTask('ascentai', 25, 'business')" class="mt-1.5 rounded border-zinc-300 dark:border-zinc-700 bg-void-black text-void-purple focus:ring-void-purple touch-target">
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-xs md:text-sm text-slate-800 dark:text-slate-100">Ascentai plan - Corp + bank account</h4>
+                    <div class="flex flex-wrap items-center gap-1.5 mt-2 text-[9px] font-mono">
+                      <span class="px-2 py-0.5 rounded bg-pink-500/10 text-pink-500 uppercase">Business</span>
+                      <span class="px-2 py-0.5 rounded bg-zinc-800/10 dark:bg-zinc-800/60 text-zinc-500 uppercase">Overdue</span>
+                      <span class="text-zinc-500">Due 2026-07-17</span>
+                    </div>
+                    <div class="mt-1 text-[9px] font-mono flex items-center gap-1 text-red-400">
+                      <span class="w-2 h-2 rounded-full bg-red-500 inline-block animate-ping"></span> High Priority
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-500">
+                    <i class="fa-solid fa-star cursor-pointer hover:text-yellow-500"></i>
+                    <i class="fa-solid fa-arrow-right cursor-pointer hover:text-void-purple"></i>
+                    <i class="fa-solid fa-trash cursor-pointer hover:text-red-500" onclick="deleteOpsTask('task-card-ascentai')"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- "+ Add Task" Floating Pink Plus Button Trigger -->
+            <div class="flex justify-end mt-4">
+              <button onclick="toggleTaskModal(true)" class="w-12 h-12 rounded-full bg-pink-500 text-white flex items-center justify-center glow-purple hover:scale-105 active:scale-95 transition-all text-lg shadow-lg">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- COLUMN B: BATTLE BOARD (Strictly Lower Body & Daily Habits) -->
+        <div class="lg:col-span-6 flex flex-col gap-6">
+          <div class="bg-slate-50 dark:bg-void-black/40 border border-slate-200 dark:border-zinc-800/60 p-5 rounded-2xl min-h-[520px] flex flex-col justify-between transition-colors">
+            
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-bold text-base md:text-lg font-mono text-slate-900 dark:text-white">
+                    <i class="fa-solid fa-dice-d20 text-void-purple mr-1.5"></i> Battle Board Bingo
+                  </h3>
+                  <p class="text-slate-500 dark:text-zinc-500 text-[10px]">Strictly lower body execution and habits. Clear blocks to log actions.</p>
+                </div>
+                
+                <div class="flex gap-2">
+                  <div class="flex items-center gap-1 bg-orange-500/10 text-orange-500 border border-orange-500/20 px-2.5 py-1 rounded-lg text-[10px] font-mono">
+                    <i class="fa-solid fa-fire animate-pulse"></i> Burn: <span id="board-burn-tokens">2</span>
+                  </div>
+                  <button onclick="rerollBattleBoard()" class="px-2.5 py-1 rounded-lg border border-purple-500/20 bg-purple-500/10 text-purple-400 text-xs font-mono hover:bg-purple-500/25 active:scale-95 transition-all touch-target">
+                    <i class="fa-solid fa-arrows-rotate mr-1"></i> Reroll
+                  </button>
+                </div>
+              </div>
+
+              <!-- Categories Guide -->
+              <div class="flex flex-wrap gap-2.5 mb-4 text-[9px] font-mono">
+                <span class="flex items-center gap-1 text-emerald-500"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Lower Body</span>
+                <span class="flex items-center gap-1 text-amber-500"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Daily Habit</span>
+                <span class="flex items-center gap-1 text-blue-500"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Mind</span>
+              </div>
+
+              <!-- 4x3 Fluid Grid optimized for touch targeting -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="battle-grid-container">
+                <!-- Dynamically populated lower-body exercises and habits -->
+              </div>
+            </div>
+
+            <!-- Board Stats -->
+            <div class="mt-6 flex flex-row items-center justify-between border-t border-slate-200 dark:border-zinc-800/40 pt-4 text-xs font-mono text-zinc-500">
+              <span>Grid Blocks Cleared: <span id="grid-cleared-score" class="text-void-purple font-bold">0</span> / 12</span>
+              <button onclick="resetBattleBoard()" class="text-zinc-500 hover:text-slate-900 dark:hover:text-white transition-all underline decoration-dotted">
+                Reset Board
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ADD TASK MODAL -->
+  <div id="task-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-50 dark:bg-[#100f1a] w-full max-w-md rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 relative shadow-2xl transition-all">
+      <h3 class="text-xl font-bold font-mono text-pink-500 flex items-center gap-2 mb-4">
+        + Add Task
+      </h3>
+
+      <form id="add-task-form" onsubmit="createOpsTask(event)" class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1">Task Description</label>
+          <input id="modal-task-desc" type="text" required placeholder="What needs to get done?" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-void-black text-xs md:text-sm focus:outline-none focus:border-pink-500 text-slate-900 dark:text-white min-h-[44px]">
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">Category</label>
+          <div class="flex flex-wrap gap-2 text-xs" id="modal-categories">
+            <button type="button" onclick="selectCategory('personal')" class="px-3 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 focus:outline-none transition-all" data-category="personal">PERSONAL</button>
+            <button type="button" onclick="selectCategory('business')" class="px-3 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 focus:outline-none transition-all" data-category="business">BUSINESS</button>
+            <button type="button" onclick="selectCategory('chore')" class="px-3 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 focus:outline-none transition-all" data-category="chore">CHORE</button>
+            <button type="button" onclick="selectCategory('mission')" class="px-3 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 focus:outline-none transition-all" data-category="mission">MISSION</button>
+            <button type="button" onclick="selectCategory('work')" class="px-3 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 focus:outline-none transition-all" data-category="work">WORK</button>
+            <button type="button" onclick="selectCategory('family')" class="px-3 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 focus:outline-none transition-all" data-category="family">FAMILY</button>
+            <button type="button" onclick="selectCategory('god')" class="px-3 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 focus:outline-none transition-all" data-category="god">⛪ GOD</button>
+            <button type="button" onclick="selectCategory('other')" class="px-3 py-1.5 rounded-full border border-pink-500 bg-pink-500/20 text-pink-400 focus:outline-none transition-all" data-category="other">OTHER</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">Urgency</label>
+          <div class="flex gap-2" id="modal-urgencies">
+            <button type="button" onclick="selectUrgency('today')" class="px-4 py-1.5 rounded-full border border-pink-500 bg-pink-500/10 text-pink-400 text-xs font-mono transition-all" data-urgency="today">TODAY</button>
+            <button type="button" onclick="selectUrgency('this_week')" class="px-4 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 text-xs font-mono transition-all" data-urgency="this_week">THIS WEEK</button>
+            <button type="button" onclick="selectUrgency('someday')" class="px-4 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 text-xs font-mono transition-all" data-urgency="someday">SOMEDAY</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">Priority</label>
+            <div class="space-y-2" id="modal-priorities">
+              <button type="button" onclick="selectPriority('high')" class="w-full text-left px-3 py-1.5 rounded-xl border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 text-xs font-mono flex items-center gap-1.5 transition-all" data-priority="high">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> HIGH
+              </button>
+              <button type="button" onclick="selectPriority('normal')" class="w-full text-left px-3 py-1.5 rounded-xl border border-yellow-500 bg-yellow-500/10 text-yellow-400 text-xs font-mono flex items-center gap-1.5 transition-all" data-priority="normal">
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span> NORMAL
+              </button>
+              <button type="button" onclick="selectPriority('low')" class="w-full text-left px-3 py-1.5 rounded-xl border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 text-xs font-mono flex items-center gap-1.5 transition-all" data-priority="low">
+                <span class="w-2.5 h-2.5 rounded-full bg-zinc-600"></span> LOW
+              </button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">Deadline</label>
+            <input id="modal-deadline" type="date" value="2026-07-20" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-void-black text-xs text-slate-800 dark:text-zinc-300 focus:outline-none min-h-[44px]">
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="toggleTaskModal(false)" class="w-1/2 py-3 rounded-xl font-bold text-xs bg-slate-200 dark:bg-zinc-800 text-slate-800 dark:text-zinc-300 hover:opacity-90 min-h-[44px]">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-3 rounded-xl font-bold text-xs bg-pink-500 text-white hover:opacity-95 min-h-[44px]">
+            Add to Board
+          </button>
+        </div>
+      </form>
+
+      <button onclick="toggleTaskModal(false)" class="absolute -bottom-16 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-pink-500 text-white flex items-center justify-center glow-purple hover:scale-105 active:scale-95 transition-all shadow-xl">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- THE $50 WATCH-THE-DEV PASS FEATURE -->
+  <section id="waitlist-section" class="max-w-7xl mx-auto px-4 md:px-6 py-12 relative">
+    <div class="bg-gradient-to-br from-indigo-50 via-slate-100 to-white dark:from-[#1b1530] dark:via-[#0f0b1b] dark:to-void-black border border-purple-500/10 dark:border-void-purple/20 rounded-2xl md:rounded-3xl p-6 md:p-12 shadow-xl flex flex-col lg:flex-row items-center gap-12 overflow-hidden transition-all">
+      
+      <!-- Copy / Proposition -->
+      <div class="lg:w-1/2 space-y-4 md:space-y-6">
+        <span class="text-xs uppercase tracking-widest font-mono text-glow text-void-purple font-bold">EXCLUSIVES IN THE LAB</span>
+        <h2 class="text-2xl md:text-4xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">
+          The $50 "Watch-The-Dev" Builder Pass
+        </h2>
+        <p class="text-slate-600 dark:text-zinc-400 text-xs md:text-sm leading-relaxed">
+          Be part of the active 3amCEO dev ecosystem. Instead of pre-ordering blindly, get immediate lifetime access to the <strong>3amCEO Builder Lab Portal</strong> hosted directly on our site.
+        </p>
+
+        <!-- Bullet List -->
+        <ul class="space-y-3.5 text-xs">
+          <li class="flex items-start gap-3 text-slate-700 dark:text-zinc-300">
+            <span class="p-1 rounded-full bg-void-purple/20 text-void-purple flex-shrink-0"><i class="fa-solid fa-video text-[10px]"></i></span>
+            <div><strong>Weekly Video Devlogs:</strong> Unfiltered deep dives into our database logic, UI building, and engineering pipeline.</div>
+          </li>
+          <li class="flex items-start gap-3 text-slate-700 dark:text-zinc-300">
+            <span class="p-1 rounded-full bg-void-cyan/20 text-void-cyan flex-shrink-0"><i class="fa-solid fa-flask text-[10px]"></i></span>
+            <div><strong>Beta Sandbox Builds:</strong> Be the first to load, break, and test staging apps like Battle Board & Daily Ops.</div>
+          </li>
+          <li class="flex items-start gap-3 text-slate-700 dark:text-zinc-300">
+            <span class="p-1 rounded-full bg-yellow-500/20 text-yellow-500 flex-shrink-0"><i class="fa-solid fa-check-to-slot text-[10px]"></i></span>
+            <div><strong>Voice on the Roadmap:</strong> Cast your votes on feature requests, app concepts, and development priority.</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- High Converting Form & Interface -->
+      <div class="lg:w-1/2 w-full bg-slate-50 dark:bg-void-black/60 border border-slate-200 dark:border-zinc-800/80 p-6 md:p-8 rounded-2xl shadow-xl">
+        <h3 class="text-lg md:text-xl font-bold font-mono text-center mb-1 text-slate-900 dark:text-white">Lock in your Early Access</h3>
+        <p class="text-center text-[10px] md:text-xs text-slate-500 dark:text-zinc-500 mb-6">Drop your email to save your spot in the 24h Early Bird launcher.</p>
+        
+        <form id="waitlist-form" onsubmit="handleSignup(event)" class="space-y-4">
+          <!-- Name -->
+          <div>
+            <label class="block text-[10px] font-mono text-slate-500 dark:text-zinc-400 mb-1">Full Name</label>
+            <input id="signup-name" type="text" required placeholder="Dave Scribe" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-void-black text-xs md:text-sm focus:outline-none focus:border-void-purple text-slate-950 dark:text-slate-100 min-h-[44px]">
+          </div>
+          <!-- Email -->
+          <div>
+            <label class="block text-[10px] font-mono text-slate-500 dark:text-zinc-400 mb-1">Email Address</label>
+            <input id="signup-email" type="email" required placeholder="dave@3amceo.com" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-void-black text-xs md:text-sm focus:outline-none focus:border-void-purple text-slate-950 dark:text-slate-100 min-h-[44px]">
+          </div>
+          <!-- Custom segment survey question -->
+          <div>
+            <label class="block text-[10px] font-mono text-slate-500 dark:text-zinc-400 mb-1">How will you deploy your VOID OS?</label>
+            <select id="signup-deploy" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-void-black text-xs md:text-sm focus:outline-none focus:border-void-purple text-slate-950 dark:text-slate-100 min-h-[44px]">
+              <option value="saas">Hosted Cloud Web App (Turnkey SaaS)</option>
+              <option value="self">Self-Hosted Source Code (Vercel, Supabase, Raspberry Pi)</option>
+              <option value="undecided">Undecided / Need to see tutorials first</option>
+            </select>
+          </div>
+
+          <button id="signup-submit-btn" type="submit" class="w-full py-4 rounded-xl font-bold text-xs md:text-sm bg-gradient-to-r from-void-purple to-void-blue text-white glow-purple hover:scale-[1.01] active:scale-[0.99] transition-all min-h-[44px]">
+            Join the Waitlist
+          </button>
+        </form>
+
+        <!-- Success Toast Simulation -->
+        <div id="signup-success" class="hidden mt-4 p-4 rounded-xl border border-green-500/20 bg-green-500/5 text-center">
+          <i class="fa-solid fa-circle-check text-green-500 text-xl mb-2"></i>
+          <h4 class="font-bold text-sm text-green-600 dark:text-green-400">Welcome to the Lab!</h4>
+          <p class="text-[10px] text-zinc-500 mt-1">Your reservation has been recorded. You are fully locked in for the Launch Day drop.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ACCURATE PRICING MATRIX -->
+  <section id="pricing-section" class="max-w-7xl mx-auto px-4 md:px-6 py-12">
+    
+    <!-- SAAS CHANNELS (PRIMARY IN CONSUMER MODE) -->
+    <div id="saas-pricing-container" class="transition-all duration-300">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <h2 class="text-2xl md:text-3xl font-extrabold font-mono text-slate-900 dark:text-white">Hosted SaaS Plans</h2>
+        <p class="text-slate-500 dark:text-zinc-500 mt-2 text-xs md:text-sm font-mono">Hosted directly on turn-key cloud web apps with zero configuration required.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <!-- Starter SaaS -->
+        <div class="bg-white dark:bg-void-card/60 border border-slate-200 dark:border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between transition-all">
+          <div>
+            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Starter SaaS</span>
+            <h3 class="text-xl font-bold font-mono mt-1 text-slate-900 dark:text-white">Starter Account</h3>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-3xl font-bold font-mono text-slate-900 dark:text-white">$10</span>
+              <span class="text-xs text-zinc-500">/ month</span>
+            </div>
+            <p class="mt-4 text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
+              Get started with access to a bundle of any 3 of your favorite modular apps.
+            </p>
+            <ul class="mt-6 space-y-3.5 text-xs text-slate-700 dark:text-zinc-300">
+              <li><i class="fa-solid fa-circle-check text-void-purple mr-2"></i> Any 3 Modular App Installs</li>
+              <li><i class="fa-solid fa-circle-check text-void-purple mr-2"></i> Standard Performance Dashboards</li>
+              <li><i class="fa-solid fa-circle-check text-void-purple mr-2"></i> Cloud Synced Storage Backups</li>
+            </ul>
+          </div>
+          <a href="#waitlist-section" class="mt-8 block w-full py-3 rounded-xl border border-slate-200 dark:border-zinc-800 hover:border-purple-500/40 text-center font-bold text-xs text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-all bg-slate-100 dark:bg-zinc-900/40 min-h-[44px] flex items-center justify-center">
+            Get Started
+          </a>
+        </div>
+
+        <!-- Standard SaaS -->
+        <div class="bg-white dark:bg-void-card/60 border border-slate-200 dark:border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between transition-all">
+          <div>
+            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Standard SaaS</span>
+            <h3 class="text-xl font-bold font-mono mt-1 text-slate-900 dark:text-white">Pro Standard</h3>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-3xl font-bold font-mono text-slate-900 dark:text-white">$15</span>
+              <span class="text-xs text-zinc-500">/ month</span>
+            </div>
+            <p class="mt-4 text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
+              Unlocks full workspace capability with access to 10 standard apps on your dashboard.
+            </p>
+            <ul class="mt-6 space-y-3.5 text-xs text-slate-700 dark:text-zinc-300">
+              <li><i class="fa-solid fa-circle-check text-void-purple mr-2"></i> Up to 10 Dashboard Apps</li>
+              <li><i class="fa-solid fa-circle-check text-void-purple mr-2"></i> Performance Goal Builders</li>
+              <li><i class="fa-solid fa-circle-check text-void-purple mr-2"></i> Continuous Cloud sync backups</li>
+            </ul>
+          </div>
+          <a href="#waitlist-section" class="mt-8 block w-full py-3 rounded-xl border border-slate-200 dark:border-zinc-800 hover:border-purple-500/40 text-center font-bold text-xs text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-all bg-slate-100 dark:bg-zinc-900/40 min-h-[44px] flex items-center justify-center">
+            Get Started
+          </a>
+        </div>
+
+        <!-- All-Access SaaS -->
+        <div class="bg-white dark:bg-void-card/60 border border-slate-200 dark:border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between transition-all">
+          <div>
+            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">All-Access SaaS</span>
+            <h3 class="text-xl font-bold font-mono mt-1 text-slate-900 dark:text-white">All-Access Pro</h3>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-3xl font-bold font-mono text-slate-900 dark:text-white">$25</span>
+              <span class="text-xs text-zinc-500">/ month</span>
+            </div>
+            <p class="mt-4 text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
+              Ultimate access package. Full installations of every modular tool + AI integration limits.
+            </p>
+            <ul class="mt-6 space-y-3.5 text-xs text-slate-700 dark:text-zinc-300">
+              <li><i class="fa-solid fa-circle-check text-void-purple mr-2"></i> Unlimited Dashboard Installs</li>
+              <li><i class="fa-solid fa-circle-check text-void-purple mr-2"></i> High Priority AI Core Features</li>
+              <li><i class="fa-solid fa-circle-check text-void-purple mr-2"></i> Ultra-Fast Database Syncing</li>
+            </ul>
+          </div>
+          <a href="#waitlist-section" class="mt-8 block w-full py-3 rounded-xl border border-slate-200 dark:border-zinc-800 hover:border-purple-500/40 text-center font-bold text-xs text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-all bg-slate-100 dark:bg-zinc-900/40 min-h-[44px] flex items-center justify-center">
+            Get Started
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CO-HOSTED & SELF HOSTED PRICING (PRIMARY IN DEVELOPER MODE) -->
+    <div id="developer-pricing-container" class="transition-all duration-300">
+      <div class="text-center max-w-2xl mx-auto mb-10 pt-4">
+        <div class="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-void-cyan font-mono text-xs font-bold mb-2">SELF-HOSTED CODE LICENSES</div>
+        <h2 class="text-2xl md:text-3xl font-extrabold font-mono text-slate-900 dark:text-white">Source Licenses & Builder Passes</h2>
+        <p class="text-slate-500 dark:text-zinc-500 mt-2 text-xs md:text-sm font-mono">Unlock lifetime source repository files, Vercel/Pi configurations, and devlogs.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        
+        <!-- Tier A: $150 Eb -->
+        <div class="bg-gradient-to-b from-purple-50 to-white dark:from-[#1c1432] dark:to-[#0d0918] border-2 border-void-purple rounded-2xl p-5 flex flex-col justify-between relative glow-purple transition-all">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-void-purple text-white text-[8px] font-mono tracking-widest uppercase whitespace-nowrap">
+            24h Launch Day Eb
+          </div>
+          <div>
+            <span class="text-[9px] font-mono text-glow text-void-purple uppercase tracking-wider">Ultimate Code</span>
+            <h3 class="text-lg font-bold font-mono mt-1 text-slate-900 dark:text-white">Founder Pass</h3>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-2xl font-bold font-mono text-slate-900 dark:text-white">$150</span>
+              <span class="text-[9px] text-zinc-500 line-through ml-1.5">$299 standard</span>
+            </div>
+            <p class="mt-3 text-[11px] text-slate-600 dark:text-zinc-300 leading-relaxed">
+              Get lifetime developer updates, repository access to all 10 apps, plus turnkey cloud accounts.
+            </p>
+          </div>
+          <a href="#waitlist-section" class="mt-6 block w-full py-2.5 rounded-xl bg-gradient-to-r from-void-purple to-void-blue text-white text-center font-bold text-xs glow-purple hover:opacity-95 transition-all">
+            Reserve Eb Now
+          </a>
+        </div>
+
+        <!-- Tier B: $599 -->
+        <div class="bg-white dark:bg-void-card/60 border border-slate-200 dark:border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between transition-all">
+          <div>
+            <span class="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">Agency Stack</span>
+            <h3 class="text-lg font-bold font-mono mt-1 text-slate-900 dark:text-white">Ultimate Dev</h3>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-2xl font-bold font-mono text-slate-900 dark:text-white">$599</span>
+              <span class="text-xs text-zinc-500">one-time</span>
+            </div>
+            <p class="mt-3 text-[11px] text-slate-600 dark:text-zinc-400 leading-relaxed">
+              Standard source file access configuration folders, Next.js server boilerplates and design files.
+            </p>
+          </div>
+          <a href="#waitlist-section" class="mt-6 block w-full py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 hover:border-purple-500/40 text-center font-bold text-xs text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-all bg-slate-100 dark:bg-zinc-900/40">
+            Get Details
+          </a>
+        </div>
+
+        <!-- Tier C: $799 -->
+        <div class="bg-white dark:bg-void-card/60 border border-slate-200 dark:border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between transition-all">
+          <div>
+            <span class="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">Enterprise</span>
+            <h3 class="text-lg font-bold font-mono mt-1 text-slate-900 dark:text-white">Sovereign Source</h3>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-2xl font-bold font-mono text-slate-900 dark:text-white">$799</span>
+              <span class="text-xs text-zinc-500">one-time</span>
+            </div>
+            <p class="mt-3 text-[11px] text-slate-600 dark:text-zinc-400 leading-relaxed">
+              Ultimate data sovereign distribution. Full offline standalone executable support logic maps.
+            </p>
+          </div>
+          <a href="#waitlist-section" class="mt-6 block w-full py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 hover:border-purple-500/40 text-center font-bold text-xs text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-all bg-slate-100 dark:bg-zinc-900/40">
+            Get Details
+          </a>
+        </div>
+
+        <!-- Tier D: $1199 -->
+        <div class="bg-white dark:bg-void-card/60 border border-slate-200 dark:border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between transition-all">
+          <div>
+            <span class="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">Superfan Backer</span>
+            <h3 class="text-lg font-bold font-mono mt-1 text-slate-900 dark:text-white">Lifetime Partner</h3>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-2xl font-bold font-mono text-slate-900 dark:text-white">$1,199</span>
+              <span class="text-xs text-zinc-500">one-time</span>
+            </div>
+            <p class="mt-3 text-[11px] text-slate-600 dark:text-zinc-400 leading-relaxed">
+              Full code ecosystem updates forever, 3amCEO community private sandbox, and direct feature voting weights.
+            </p>
+          </div>
+          <a href="#waitlist-section" class="mt-6 block w-full py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 hover:border-purple-500/40 text-center font-bold text-xs text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-all bg-slate-100 dark:bg-zinc-900/40">
+            Become Partner
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- RECENT ROADMAP AND FUTURE APPS -->
+  <section class="max-w-7xl mx-auto px-4 md:px-6 py-12 border-t border-slate-200 dark:border-zinc-800/40 transition-colors">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-bold font-mono text-slate-900 dark:text-white">Future App Roadmap</h2>
+      <p class="text-slate-500 dark:text-zinc-500 mt-2 text-xs md:text-sm font-mono">We are consistently building modular apps across multiple life categories.</p>
+    </div>
+
+    <!-- Grid of Future Apps -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      
+      <!-- App 1: Field Base -->
+      <div class="bg-white dark:bg-void-card/40 border border-slate-200 dark:border-zinc-800/40 rounded-2xl p-5 transition-all">
+        <div class="w-10 h-10 rounded-xl bg-void-purple/10 text-void-purple flex items-center justify-center mb-4 text-lg">
+          <i class="fa-solid fa-server"></i>
+        </div>
+        <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white">Field Base</h4>
+        <p class="text-[11px] text-slate-500 dark:text-zinc-500 mt-2 leading-relaxed">Robust operational task logs, facility monitoring, and network monitoring dashboards.</p>
+      </div>
+
+      <!-- App 2: Therapy Vault -->
+      <div class="bg-white dark:bg-void-card/40 border border-slate-200 dark:border-zinc-800/40 rounded-2xl p-5 transition-all">
+        <div class="w-10 h-10 rounded-xl bg-void-cyan/10 text-void-cyan flex items-center justify-center mb-4 text-lg">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white">Therapy Vault</h4>
+        <p class="text-[11px] text-slate-500 dark:text-zinc-500 mt-2 leading-relaxed">Internal Family Systems (IFS) mental tracking module, mapping brain dumps and emotion-logs.</p>
+      </div>
+
+      <!-- App 3: RepurposeIt -->
+      <div class="bg-white dark:bg-void-card/40 border border-slate-200 dark:border-zinc-800/40 rounded-2xl p-5 transition-all">
+        <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center mb-4 text-lg">
+          <i class="fa-solid fa-arrows-spin"></i>
+        </div>
+        <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white">RepurposeIt</h4>
+        <p class="text-[11px] text-slate-500 dark:text-zinc-500 mt-2 leading-relaxed">Turn rough devnotes or audio transcripts into structured social assets for multiple pipelines in seconds.</p>
+      </div>
+
+      <!-- App 4: Word & Spirit -->
+      <div class="bg-white dark:bg-void-card/40 border border-slate-200 dark:border-zinc-800/40 rounded-2xl p-5 transition-all">
+        <div class="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center mb-4 text-lg">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <h4 class="font-bold font-mono text-sm text-slate-900 dark:text-white">Word & Spirit</h4>
+        <p class="text-[11px] text-slate-500 dark:text-zinc-500 mt-2 leading-relaxed">Gamified Bible study, scripture memorization triggers, and modular devotional metrics.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-200 dark:border-zinc-800/40 py-12 px-6 text-center text-xs text-slate-500 dark:text-zinc-500 transition-colors">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6">
+          <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]">
+            <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" stroke-width="12"/>
+            <path d="M 100,20 A 80,80 0 0,0 25,75" fill="none" stroke="url(#logoGrad)" stroke-width="12"/>
+            <path d="M 25,125 A 80,80 0 0,0 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="12"/>
+            <path d="M 175,125 A 80,80 0 0,1 100,180" fill="none" stroke="url(#logoGrad)" stroke-width="12"/>
+            <path d="M 30,75 L 100,165 L 170,75 L 132,75 L 100,125 L 68,75 Z" fill="url(#logoGrad)"/>
+          </svg>
+        </div>
+        <span class="font-mono text-slate-700 dark:text-zinc-400 font-bold tracking-wider">VOID OS</span>
+      </div>
+      <p>&copy; 2026 VOID OS / 3amCEO. Built with ⚡ in Chatham, Ontario. All rights reserved.</p>
+      <div class="flex gap-4">
+        <a href="#waitlist-section" class="hover:text-void-purple transition-all"><i class="fa-brands fa-github text-base"></i></a>
+        <a href="#waitlist-section" class="hover:text-void-purple transition-all"><i class="fa-brands fa-x-twitter text-base"></i></a>
+        <a href="#waitlist-section" class="hover:text-void-purple transition-all"><i class="fa-brands fa-discord text-base"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    // SPLASH SCREEN BOOT SIMULATION
+    const logs = [
+      "Connecting to Supabase instance...",
+      "Mapping RLS (Row Level Security)... OK",
+      "Parsing Value Oriented Architecture files...",
+      "Synthesizing Battle Board grid parameters...",
+      "Initializing Daily Ops dashboard layout...",
+      "Configuring environment variables & Stripe webhooks...",
+      "Establishing server sync on Hostinger pre-launch...",
+      "VOID OS System Initialized Successfully."
+    ];
+
+    let logIdx = 0;
+    const bootContainer = document.getElementById("boot-logs");
+
+    function renderLog() {
+      if (logIdx < logs.length) {
+        const p = document.createElement("p");
+        p.className = "text-[9px] md:text-[10px] text-green-500 font-mono tracking-wide animate-pulse";
+        p.textContent = `> ${logs[logIdx]}`;
+        bootContainer.appendChild(p);
+        bootContainer.scrollTop = bootContainer.scrollHeight;
+        logIdx++;
+        setTimeout(renderLog, 150);
+      } else {
+        setTimeout(skipSplash, 400);
+      }
+    }
+
+    // Start logs rendering once DOM is ready
+    window.onload = function() {
+      setTimeout(renderLog, 100);
+      
+      // Check URL hash for direct mode targeting (#developer or #consumer)
+      if (window.location.hash === '#developer') {
+        setMode('developer');
+      } else if (window.location.hash === '#consumer') {
+        setMode('consumer');
+      }
+    }
+
+    function skipSplash() {
+      const splash = document.getElementById("splash-screen");
+      splash.style.opacity = "0";
+      setTimeout(() => {
+        splash.style.display = "none";
+        // Show role selection modal on first finish if not already selected
+        const modal = document.getElementById("role-selection-modal");
+        if (modal) {
+          modal.classList.remove("hidden");
+        }
+      }, 800);
+    }
+
+    // ----------------------------------------------------
+    // ROLE / MODE CONTROLLER (Consumer vs Developer Views)
+    // ----------------------------------------------------
+    let currentMode = 'consumer';
+
+    function chooseInitialRole(role) {
+      document.getElementById("role-selection-modal").classList.add("hidden");
+      if (role === 'notsure') {
+        setMode('consumer');
+      } else {
+        setMode(role);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      
+      const btnConsumer = document.getElementById("mode-btn-consumer");
+      const btnDeveloper = document.getElementById("mode-btn-developer");
+      const heroBadgeText = document.getElementById("hero-badge-text");
+      const heroTitle = document.getElementById("hero-title");
+      const heroSubtitle = document.getElementById("hero-subtitle");
+      const heroSecondaryCta = document.getElementById("hero-secondary-cta");
+      const devSpecsSection = document.getElementById("dev-specs-section");
+      const saasPricingContainer = document.getElementById("saas-pricing-container");
+      const developerPricingContainer = document.getElementById("developer-pricing-container");
+
+      if (mode === 'developer') {
+        // Active button styles
+        btnDeveloper.className = "px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-mono font-bold transition-all flex items-center gap-1.5 bg-void-cyan text-slate-950 shadow-sm";
+        btnConsumer.className = "px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-mono font-bold text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1.5";
+
+        // Developer copy and views
+        heroBadgeText.textContent = "DEVELOPER MODE: SOURCE CODE & DATA SOVEREIGNTY";
+        heroTitle.innerHTML = `Build & Self-Host <br/><span class="bg-clip-text text-transparent bg-gradient-to-r from-void-cyan via-indigo-400 to-void-purple">Your Sovereign Life OS.</span>`;
+        heroSubtitle.textContent = "Full Next.js / Supabase source repository access. Deploy VOID OS to your Vercel, Raspberry Pi, or private server with absolute data sovereignty.";
+        heroSecondaryCta.innerHTML = `Watch Dev ($50 Pass) <i class="fa-solid fa-code ml-2"></i>`;
+        heroSecondaryCta.href = "#waitlist-section";
+
+        devSpecsSection.classList.remove("hidden");
+        
+        // Emphasize Developer Pricing first
+        if (developerPricingContainer && saasPricingContainer) {
+          developerPricingContainer.classList.remove("opacity-50");
+          saasPricingContainer.classList.add("opacity-60");
+        }
+        
+        window.history.replaceState(null, null, '#developer');
+      } else {
+        // Consumer Mode
+        btnConsumer.className = "px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-mono font-bold transition-all flex items-center gap-1.5 bg-void-purple text-white shadow-sm";
+        btnDeveloper.className = "px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-mono font-bold text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1.5";
+
+        // Consumer copy and views
+        heroBadgeText.textContent = "CONSUMER MODE: READY-TO-USE GAMIFIED LIFE OS";
+        heroTitle.innerHTML = `The Gamified Life OS <br/><span class="bg-clip-text text-transparent bg-gradient-to-r from-void-purple via-indigo-500 to-void-cyan">You Deploy & Own.</span>`;
+        heroSubtitle.textContent = "Ditch expensive subscription habit-trackers. VOID OS is a turnkey life productivity ecosystem offering absolute data sovereignty and gamified progress loops directly tied to your daily actions.";
+        heroSecondaryCta.innerHTML = `View SaaS Plans <i class="fa-solid fa-tags ml-2"></i>`;
+        heroSecondaryCta.href = "#pricing-section";
+
+        devSpecsSection.classList.add("hidden");
+
+        if (developerPricingContainer && saasPricingContainer) {
+          developerPricingContainer.classList.add("opacity-60");
+          saasPricingContainer.classList.remove("opacity-50");
+        }
+
+        window.history.replaceState(null, null, '#consumer');
+      }
+    }
+
+    // THEME SELECTOR ENGINE
+    function toggleTheme() {
+      const html = document.documentElement;
+      const icon = document.getElementById("theme-icon");
+      if (html.classList.contains("dark")) {
+        html.classList.remove("dark");
+        icon.className = "fa-solid fa-sun text-yellow-500";
+      } else {
+        html.classList.add("dark");
+        icon.className = "fa-solid fa-moon text-void-purple";
+      }
+    }
+
+    // ----------------------------------------------------
+    // GLOBAL SIMULATOR STATE (Linked with live Radar Chart)
+    // ----------------------------------------------------
+    const appState = {
+      xp: 56,
+      nextLevelXp: 159,
+      level: 19,
+      streak: 1,
+      faith: 15,
+      tasks: [
+        {
+          id: 'ascentai',
+          text: "Ascentai plan - Corp + bank account",
+          category: 'business',
+          urgency: 'today',
+          priority: 'high',
+          deadline: '2026-07-17',
+          xpValue: 25
+        }
+      ],
+      battleBoardScore: 0,
+      boardBurnTokens: 2,
+      lifeStats: {
+        spiritual: 30,
+        love: 45,
+        work: 35,
+        focus: 25,
+        mind: 40,
+        strength: 25
+      }
+    };
+
+    // ----------------------------------------------------
+    // DAILY OPS CONTROLLERS (Based on 7620 & 7622)
+    // ----------------------------------------------------
+    let selectedModalCategory = 'other';
+    let selectedModalUrgency = 'today';
+    let selectedModalPriority = 'normal';
+
+    function toggleTaskModal(show) {
+      const modal = document.getElementById("task-modal");
+      if (show) {
+        modal.classList.remove("hidden");
+        document.getElementById("modal-task-desc").value = "";
+        selectCategory('other');
+        selectUrgency('today');
+        selectPriority('normal');
+      } else {
+        modal.classList.add("hidden");
+      }
+    }
+
+    function selectCategory(category) {
+      selectedModalCategory = category;
+      const buttons = document.querySelectorAll("#modal-categories button");
+      buttons.forEach(btn => {
+        const cat = btn.getAttribute("data-category");
+        if (cat === category) {
+          btn.className = "px-3 py-1.5 rounded-full border border-pink-500 bg-pink-500/20 text-pink-400 focus:outline-none transition-all";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 focus:outline-none transition-all";
+        }
+      });
+    }
+
+    function selectUrgency(urgency) {
+      selectedModalUrgency = urgency;
+      const buttons = document.querySelectorAll("#modal-urgencies button");
+      buttons.forEach(btn => {
+        const urg = btn.getAttribute("data-urgency");
+        if (urg === urgency) {
+          btn.className = "px-4 py-1.5 rounded-full border border-pink-500 bg-pink-500/10 text-pink-400 text-xs font-mono transition-all";
+        } else {
+          btn.className = "px-4 py-1.5 rounded-full border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 text-xs font-mono transition-all";
+        }
+      });
+    }
+
+    function selectPriority(priority) {
+      selectedModalPriority = priority;
+      const buttons = document.querySelectorAll("#modal-priorities button");
+      buttons.forEach(btn => {
+        const prio = btn.getAttribute("data-priority");
+        if (prio === priority) {
+          if (priority === 'high') {
+            btn.className = "w-full text-left px-3 py-1.5 rounded-xl border border-red-500 bg-red-500/10 text-red-400 text-xs font-mono flex items-center gap-1.5 transition-all";
+          } else if (priority === 'normal') {
+            btn.className = "w-full text-left px-3 py-1.5 rounded-xl border border-yellow-500 bg-yellow-500/10 text-yellow-400 text-xs font-mono flex items-center gap-1.5 transition-all";
+          } else {
+            btn.className = "w-full text-left px-3 py-1.5 rounded-xl border border-zinc-500 bg-zinc-500/10 text-zinc-400 text-xs font-mono flex items-center gap-1.5 transition-all";
+          }
+        } else {
+          btn.className = "w-full text-left px-3 py-1.5 rounded-xl border border-zinc-700 bg-void-black/20 text-zinc-300 hover:border-pink-500 text-xs font-mono flex items-center gap-1.5 transition-all";
+        }
+      });
+    }
+
+    function createOpsTask(event) {
+      event.preventDefault();
+      const desc = document.getElementById("modal-task-desc").value;
+      const deadline = document.getElementById("modal-deadline").value || "2026-07-20";
+      
+      const newTask = {
+        id: 'task_' + Date.now(),
+        text: desc,
+        category: selectedModalCategory,
+        urgency: selectedModalUrgency,
+        priority: selectedModalPriority,
+        deadline: deadline,
+        xpValue: selectedModalPriority === 'high' ? 30 : selectedModalPriority === 'normal' ? 15 : 10
+      };
+
+      appState.tasks.push(newTask);
+      renderOpsTasks();
+      toggleTaskModal(false);
+    }
+
+    function renderOpsTasks() {
+      const container = document.getElementById("ops-task-list");
+      if (!container) return;
+      container.innerHTML = "";
+      
+      appState.tasks.forEach(task => {
+        const priorityColor = task.priority === 'high' ? 'red-500' : task.priority === 'normal' ? 'yellow-500' : 'zinc-500';
+        const card = document.createElement("div");
+        card.id = `task-card-${task.id}`;
+        card.className = "border border-slate-200 dark:border-zinc-800 p-4 rounded-xl flex items-start gap-3 relative transition-all duration-300 bg-white dark:bg-zinc-950/20";
+        
+        card.innerHTML = `
+          <input type="checkbox" onchange="completeOpsTask('${task.id}', ${task.xpValue}, '${task.category}')" class="mt-1.5 rounded border-zinc-300 dark:border-zinc-700 bg-void-black text-void-purple focus:ring-void-purple touch-target">
+          <div class="flex-1">
+            <h4 class="font-semibold text-xs md:text-sm text-slate-800 dark:text-slate-100">${task.text}</h4>
+            <div class="flex flex-wrap items-center gap-1.5 mt-2 text-[9px] font-mono">
+              <span class="px-2 py-0.5 rounded bg-void-purple/10 text-void-purple uppercase">${task.category}</span>
+              <span class="text-zinc-500">Due ${task.deadline}</span>
+            </div>
+            <div class="mt-1 text-[9px] font-mono flex items-center gap-1 text-${priorityColor}">
+              <span class="w-1.5 h-1.5 rounded-full bg-${priorityColor} inline-block"></span> ${task.priority.toUpperCase()} PRIORITY
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-500">
+            <i class="fa-solid fa-star cursor-pointer hover:text-yellow-500"></i>
+            <i class="fa-solid fa-arrow-right cursor-pointer hover:text-void-purple"></i>
+            <i class="fa-solid fa-trash cursor-pointer hover:text-red-500" onclick="deleteOpsTask('task-card-${task.id}')"></i>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      const countEl = document.getElementById("ops-count");
+      if (countEl) {
+        countEl.textContent = appState.tasks.length;
+      }
+    }
+
+    function completeOpsTask(id, xpValue, category) {
+      const card = document.getElementById(`task-card-${id}`);
+      if (card) {
+        card.style.opacity = '0.3';
+        card.style.transform = 'scale(0.97)';
+      }
+
+      appState.xp += xpValue;
+      
+      // Update Radar Stats based on task category completed!
+      if (category === 'god' || category === 'spiritual') {
+        appState.faith = Math.min(100, appState.faith + 5);
+        appState.lifeStats.spiritual = Math.min(100, appState.lifeStats.spiritual + 15);
+      } else if (category === 'business' || category === 'work') {
+        appState.lifeStats.work = Math.min(100, appState.lifeStats.work + 15);
+      } else if (category === 'mission' || category === 'personal') {
+        appState.lifeStats.focus = Math.min(100, appState.lifeStats.focus + 15);
+        appState.lifeStats.mind = Math.min(100, appState.lifeStats.mind + 10);
+      } else if (category === 'family') {
+        appState.lifeStats.love = Math.min(100, appState.lifeStats.love + 15);
+      }
+
+      if (appState.xp >= appState.nextLevelXp) {
+        appState.xp = appState.xp - appState.nextLevelXp;
+        appState.level++;
+        appState.streak++;
+        
+        if (appState.level >= 20) {
+          document.getElementById("ops-rank").textContent = "WARRIOR SCRIBE";
+        }
+      }
+
+      setTimeout(() => {
+        appState.tasks = appState.tasks.filter(t => t.id !== id);
+        renderOpsTasks();
+        updateUIStats();
+        updateRadarChart();
+      }, 500);
+    }
+
+    function deleteOpsTask(elementId) {
+      const card = document.getElementById(elementId);
+      if (card) {
+        card.remove();
+        appState.tasks = appState.tasks.filter(t => `task-card-${t.id}` !== elementId);
+        const countEl = document.getElementById("ops-count");
+        if (countEl) {
+          countEl.textContent = appState.tasks.length;
+        }
+      }
+    }
+
+    function updateUIStats() {
+      document.getElementById("ops-xp").textContent = appState.xp;
+      document.getElementById("ops-level").textContent = appState.level;
+      document.getElementById("ops-streak").textContent = appState.streak;
+      document.getElementById("ops-faith").textContent = `${appState.faith}%`;
+      
+      const xpPercent = (appState.xp / appState.nextLevelXp) * 100;
+      document.getElementById("ops-xp-bar").style.width = `${xpPercent}%`;
+    }
+
+    // ----------------------------------------------------
+    // BATTLE BOARD CONTROLLERS (Strictly Lower Body & Habits)
+    // ----------------------------------------------------
+    const lowerBodyHabits = [
+      { text: "Banded Hip Abductions", cat: "lower", val: 12 },
+      { text: "Deep Squat Hold (2m)", cat: "lower", val: 15 },
+      { text: "Calf Raises (3x20)", cat: "lower", val: 10 },
+      { text: "Pistol Squat Practice", cat: "lower", val: 20 },
+      { text: "Read 10 Pages", cat: "mind", val: 10 },
+      { text: "No Sugar / Clean Eat", cat: "habit", val: 15 },
+      { text: "Drink 3L Water", cat: "habit", val: 8 },
+      { text: "Journal Thoughts", cat: "mind", val: 10 },
+      { text: "Hamstring Glute Bridges", cat: "lower", val: 12 },
+      { text: "Tibialis Raises (30)", cat: "lower", val: 10 },
+      { text: "Kettlebell Swings (20)", cat: "lower", val: 15 },
+      { text: "Leg Stretching Protocol", cat: "lower", val: 12 }
+    ];
+
+    function populateBattleBoard() {
+      const grid = document.getElementById("battle-grid-container");
+      grid.innerHTML = "";
+      
+      lowerBodyHabits.forEach((task, idx) => {
+        const card = document.createElement("button");
+        card.id = `board-cell-${idx}`;
+        card.onclick = () => toggleBoardCell(idx);
+        card.className = `p-3 h-20 w-full flex flex-col justify-between items-start rounded-xl text-left border border-slate-200 dark:border-zinc-800 transition-all text-[11px] font-mono bg-white dark:bg-void-black/80 hover:bg-slate-100 dark:hover:bg-zinc-950 relative overflow-hidden min-h-[44px] touch-manipulation`;
+        
+        let accentColor = "bg-emerald-500";
+        if (task.cat === "habit") accentColor = "bg-amber-500";
+        if (task.cat === "mind") accentColor = "bg-blue-500";
+
+        const categoryIndicator = document.createElement("span");
+        categoryIndicator.className = `w-1 h-8 rounded-full absolute left-0 top-1/2 -translate-y-1/2 ${accentColor}`;
+        card.appendChild(categoryIndicator);
+
+        const label = document.createElement("span");
+        label.className = "pl-2 text-slate-800 dark:text-zinc-300 font-bold tracking-tight uppercase leading-snug";
+        label.textContent = task.text;
+        card.appendChild(label);
+
+        const xpBadge = document.createElement("span");
+        xpBadge.className = "pl-2 text-[8px] text-zinc-500 font-normal";
+        xpBadge.textContent = `+${task.val} XP`;
+        card.appendChild(xpBadge);
+
+        grid.appendChild(card);
+      });
+    }
+
+    function toggleBoardCell(idx) {
+      const cell = document.getElementById(`board-cell-${idx}`);
+      const task = lowerBodyHabits[idx];
+
+      if (cell.classList.contains("border-void-purple")) {
+        cell.classList.remove("border-void-purple", "bg-void-purple/10", "text-void-purple");
+        appState.battleBoardScore = Math.max(0, appState.battleBoardScore - 1);
+        // Decrease stats
+        if (task.cat === "lower") appState.lifeStats.strength = Math.max(20, appState.lifeStats.strength - 10);
+        if (task.cat === "mind") appState.lifeStats.mind = Math.max(20, appState.lifeStats.mind - 10);
+        if (task.cat === "habit") appState.lifeStats.focus = Math.max(20, appState.lifeStats.focus - 10);
+      } else {
+        cell.classList.add("border-void-purple", "bg-void-purple/10", "text-void-purple");
+        appState.battleBoardScore++;
+        
+        // Link board completion directly to global player XP and stats!
+        appState.xp += task.val;
+        
+        if (task.cat === "lower") appState.lifeStats.strength = Math.min(100, appState.lifeStats.strength + 15);
+        if (task.cat === "mind") appState.lifeStats.mind = Math.min(100, appState.lifeStats.mind + 15);
+        if (task.cat === "habit") appState.lifeStats.focus = Math.min(100, appState.lifeStats.focus + 15);
+
+        if (appState.xp >= appState.nextLevelXp) {
+          appState.xp = appState.xp - appState.nextLevelXp;
+          appState.level++;
+          appState.streak++;
+        }
+      }
+
+      document.getElementById("grid-cleared-score").textContent = appState.battleBoardScore;
+      updateUIStats();
+      updateRadarChart();
+    }
+
+    function rerollBattleBoard() {
+      if (appState.boardBurnTokens > 0) {
+        appState.boardBurnTokens--;
+        document.getElementById("board-burn-tokens").textContent = appState.boardBurnTokens;
+        
+        lowerBodyHabits.sort(() => Math.random() - 0.5);
+        populateBattleBoard();
+        resetBattleBoard();
+      }
+    }
+
+    function resetBattleBoard() {
+      appState.battleBoardScore = 0;
+      document.getElementById("grid-cleared-score").textContent = appState.battleBoardScore;
+      populateBattleBoard();
+    }
+
+    // ----------------------------------------------------
+    // STATS RADAR SYSTEM
+    // ----------------------------------------------------
+    function updateRadarChart() {
+      const center = 100;
+      const r = 80;
+
+      const angSpiritual = -Math.PI / 2;
+      const angLove = -Math.PI / 6;
+      const angWork = Math.PI / 6;
+      const angFocus = Math.PI / 2;
+      const angMind = 5 * Math.PI / 6;
+      const angStrength = 7 * Math.PI / 6;
+
+      function getCoord(angle, val) {
+        const factor = val / 100;
+        const x = center + r * factor * Math.cos(angle);
+        const y = center + r * factor * Math.sin(angle);
+        return { x: Math.round(x), y: Math.round(y) };
+      }
+
+      const pS = getCoord(angSpiritual, appState.lifeStats.spiritual);
+      const pL = getCoord(angLove, appState.lifeStats.love);
+      const pW = getCoord(angWork, appState.lifeStats.work);
+      const pF = getCoord(angFocus, appState.lifeStats.focus);
+      const pM = getCoord(angMind, appState.lifeStats.mind);
+      const pSt = getCoord(angStrength, appState.lifeStats.strength);
+
+      const poly = document.getElementById("radar-poly");
+      poly.setAttribute("points", `${pS.x},${pS.y} ${pL.x},${pL.y} ${pW.x},${pW.y} ${pF.x},${pF.y} ${pM.x},${pM.y} ${pSt.x},${pSt.y}`);
+
+      document.getElementById("node-spiritual").setAttribute("cx", pS.x);
+      document.getElementById("node-spiritual").setAttribute("cy", pS.y);
+      document.getElementById("node-love").setAttribute("cx", pL.x);
+      document.getElementById("node-love").setAttribute("cy", pL.y);
+      document.getElementById("node-work").setAttribute("cx", pW.x);
+      document.getElementById("node-work").setAttribute("cy", pW.y);
+      document.getElementById("node-focus").setAttribute("cx", pF.x);
+      document.getElementById("node-focus").setAttribute("cy", pF.y);
+      document.getElementById("node-mind").setAttribute("cx", pM.x);
+      document.getElementById("node-mind").setAttribute("cy", pM.y);
+      document.getElementById("node-strength").setAttribute("cx", pSt.x);
+      document.getElementById("node-strength").setAttribute("cy", pSt.y);
+    }
+
+    // ----------------------------------------------------
+    // SUPABASE WAITLIST STORAGE INTEGRATION
+    // ----------------------------------------------------
+    // Try to safely initialize client if standard environment variables exist.
+    const supabaseUrl = ""; // Hydrated automatically on Vercel build
+    const supabaseAnonKey = ""; 
+    let supabaseClientInstance = null;
+    
+    if (supabaseUrl && supabaseAnonKey) {
+      try {
+        supabaseClientInstance = supabase.createClient(supabaseUrl, supabaseAnonKey);
+      } catch (err) {
+        console.warn("Supabase Client failed initialization: check keys configuration.");
+      }
+    }
+
+    async function handleSignup(event) {
+      event.preventDefault();
+      
+      const name = document.getElementById("signup-name").value;
+      const email = document.getElementById("signup-email").value;
+      const deploymentType = document.getElementById("signup-deploy").value;
+      const submitBtn = document.getElementById("signup-submit-btn");
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Processing...";
+
+      if (supabaseClientInstance) {
+        try {
+          const { error } = await supabaseClientInstance
+            .from('signups')
+            .insert([{ name, email, deployment_type: deploymentType }]);
+          
+          if (error) throw error;
+        } catch (err) {
+          console.error("Database storage failed, falling back gracefully: ", err);
+        }
+      } else {
+        // Fallback local persistence storage so user data is never lost pre-config!
+        const localSignups = JSON.parse(localStorage.getItem("void_signups") || "[]");
+        localSignups.push({ name, email, deploymentType, date: new Date().toISOString() });
+        localStorage.setItem("void_signups", JSON.stringify(localSignups));
+      }
+
+      // Smooth visual confirmation transition
+      document.getElementById("waitlist-form").classList.add("hidden");
+      document.getElementById("signup-success").classList.remove("hidden");
+    }
+
+    // Initialize Everything
+    renderOpsTasks();
+    populateBattleBoard();
+    updateUIStats();
+    updateRadarChart();
+  </script>
+</body>
+</html>
