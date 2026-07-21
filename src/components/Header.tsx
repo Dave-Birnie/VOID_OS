@@ -1,0 +1,124 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import { User, Code, LogIn, LogOut, Shield, Sparkles, MessageSquare, Video } from "lucide-react";
+import { UserProfile } from "@/lib/supabase/client";
+
+interface HeaderProps {
+  mode: "consumer" | "developer";
+  onModeChange: (mode: "consumer" | "developer") => void;
+  user: UserProfile | null;
+  onOpenAuth: () => void;
+  onLogout: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({
+  mode,
+  onModeChange,
+  user,
+  onOpenAuth,
+  onLogout,
+}) => {
+  return (
+    <header className="sticky top-0 z-40 backdrop-blur-md bg-void-black/80 border-b border-zinc-800/80 py-3.5 px-4 md:px-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Brand Logo & Name */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 relative">
+            <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:scale-105 transition-transform">
+              <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" strokeWidth="12"/>
+              <path d="M 100,20 A 80,80 0 0,0 25,75" fill="none" stroke="url(#logoGrad)" strokeWidth="12"/>
+              <path d="M 25,125 A 80,80 0 0,0 100,180" fill="none" stroke="url(#logoGrad)" strokeWidth="12"/>
+              <path d="M 175,125 A 80,80 0 0,1 100,180" fill="none" stroke="url(#logoGrad)" strokeWidth="12"/>
+              <path d="M 30,75 L 100,165 L 170,75 L 132,75 L 100,125 L 68,75 Z" fill="url(#logoGrad)"/>
+            </svg>
+          </div>
+          <div>
+            <span className="font-bold text-lg tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-void-purple via-indigo-400 to-void-cyan font-mono">
+              VOID OS
+            </span>
+            <span className="hidden sm:block text-[8px] tracking-widest text-zinc-400 font-mono uppercase">
+              Value Oriented Infrastructure Design
+            </span>
+          </div>
+        </Link>
+
+        {/* Navigation Links */}
+        <nav className="hidden md:flex items-center gap-6 text-xs font-mono text-zinc-300">
+          <Link href="/" className="hover:text-void-purple transition-colors">
+            Overview
+          </Link>
+          <Link href="/dev-journey" className="flex items-center gap-1.5 hover:text-void-cyan transition-colors">
+            <Video className="w-3.5 h-3.5 text-void-purple" />
+            Dev Journey
+          </Link>
+          <Link href="/community-chat" className="flex items-center gap-1.5 hover:text-void-pink transition-colors">
+            <MessageSquare className="w-3.5 h-3.5 text-void-pink" />
+            Community Chat
+          </Link>
+          {user?.role === "admin" && (
+            <Link href="/admin" className="flex items-center gap-1.5 text-amber-400 font-bold hover:text-amber-300 transition-colors">
+              <Shield className="w-3.5 h-3.5 text-amber-400" />
+              Admin CMS
+            </Link>
+          )}
+        </nav>
+
+        {/* Controls & User Profile */}
+        <div className="flex items-center gap-3">
+          {/* CONSUMER vs DEVELOPER Mode Toggle */}
+          <div className="bg-zinc-900/90 p-1 rounded-full border border-zinc-800 flex items-center shadow-inner">
+            <button
+              onClick={() => onModeChange("consumer")}
+              className={`px-3 py-1 md:px-3.5 md:py-1 rounded-full text-[10px] md:text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+                mode === "consumer"
+                  ? "bg-void-purple text-white shadow-md glow-purple"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              <User className="w-3 h-3" /> <span className="hidden sm:inline">Consumer</span>
+            </button>
+            <button
+              onClick={() => onModeChange("developer")}
+              className={`px-3 py-1 md:px-3.5 md:py-1 rounded-full text-[10px] md:text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+                mode === "developer"
+                  ? "bg-void-cyan text-slate-950 shadow-md glow-cyan"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              <Code className="w-3 h-3" /> <span className="hidden sm:inline">Developer</span>
+            </button>
+          </div>
+
+          {/* User Auth state */}
+          {user ? (
+            <div className="flex items-center gap-2">
+              <div className="hidden lg:flex flex-col items-end text-right font-mono">
+                <span className="text-xs font-bold text-white">{user.full_name || user.email}</span>
+                <span className="text-[9px] text-void-cyan">
+                  {user.role === "admin" ? "⚡ Admin Account" : user.has_dev_pass ? "⭐ Dev Pass Active" : "Free User"}
+                </span>
+              </div>
+              <button
+                onClick={onLogout}
+                title="Sign Out"
+                className="p-2 rounded-xl border border-zinc-800 hover:border-red-500/50 text-zinc-400 hover:text-red-400 transition-all bg-black/30"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenAuth}
+              className="px-4 py-2 rounded-full font-mono font-bold text-xs tracking-wider uppercase transition-all bg-gradient-to-r from-void-purple to-void-blue text-white glow-purple hover:scale-105 active:scale-95 flex items-center gap-1.5"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Register Free</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};
