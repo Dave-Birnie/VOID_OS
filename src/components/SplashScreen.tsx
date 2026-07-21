@@ -24,7 +24,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onDismiss }) => {
     let index = 0;
     const interval = setInterval(() => {
       if (index < bootMessages.length) {
-        setLogs((prev) => [...prev, bootMessages[index]]);
+        // Capture the message synchronously. Reading bootMessages[index]
+        // inside the setLogs updater would run after index++ advanced it,
+        // pushing an undefined entry that later crashes the render.
+        const nextMessage = bootMessages[index];
+        setLogs((prev) => [...prev, nextMessage]);
         index++;
       } else {
         clearInterval(interval);
@@ -84,7 +88,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onDismiss }) => {
 
         {/* Terminal log output */}
         <div className="mt-4 font-mono text-[11px] text-zinc-400 w-full h-28 overflow-y-auto p-3 bg-black/60 rounded-xl border border-zinc-800 text-left space-y-1">
-          {logs.map((msg, i) => (
+          {logs.filter(Boolean).map((msg, i) => (
             <div key={i} className="leading-snug">
               <span className="text-void-cyan font-bold">{msg.split(" ")[0]}</span> {msg.substring(msg.indexOf(" ") + 1)}
             </div>
