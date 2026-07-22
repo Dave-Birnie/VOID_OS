@@ -39,13 +39,17 @@ export default function HomePage() {
   // Real Supabase session (replaces the old localStorage demo state).
   const { profile: user } = useSessionProfile();
 
-  // Splash + path-select are a one-time intro. Once a visitor has seen them we
-  // never show them again — returning users land straight in Consumer view.
+  // Splash + path-select are a one-time intro. The splash is marked seen the
+  // moment it's dismissed, so it can never reappear on the site again.
   useEffect(() => {
-    if (localStorage.getItem("void_os_onboarded")) return;
-    setShowSplash(true);
-    setModeChosen(false);
+    if (!localStorage.getItem("void_os_splash_seen")) setShowSplash(true);
+    if (!localStorage.getItem("void_os_onboarded")) setModeChosen(false);
   }, []);
+
+  const dismissSplash = () => {
+    localStorage.setItem("void_os_splash_seen", "1");
+    setShowSplash(false);
+  };
 
   const finishOnboarding = () => {
     localStorage.setItem("void_os_onboarded", "1");
@@ -116,7 +120,7 @@ export default function HomePage() {
       <div className={`fixed inset-0 -z-10 pointer-events-none transition-colors duration-700 ${t.wash}`} />
 
       {/* Boot sequence splash screen — first visit only */}
-      {showSplash && <SplashScreen onDismiss={() => setShowSplash(false)} />}
+      {showSplash && <SplashScreen onDismiss={dismissSplash} />}
 
       {/* After splash: choose Consumer or Developer (first visit only) */}
       {!showSplash && !modeChosen && (
