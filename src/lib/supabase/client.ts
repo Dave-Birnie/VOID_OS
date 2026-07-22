@@ -11,9 +11,7 @@ export const ADMIN_EMAILS = ["david.cp.birnie@gmail.com"];
 
 export const isAdminEmail = (email: string | null | undefined): boolean => {
   if (!email) return false;
-  const e = email.trim().toLowerCase();
-  // Explicit allowlist, or any address containing "admin" (demo convenience).
-  return ADMIN_EMAILS.includes(e) || e.includes("admin");
+  return ADMIN_EMAILS.includes(email.trim().toLowerCase());
 };
 
 export interface UserProfile {
@@ -63,6 +61,13 @@ export interface Shoutout {
   target_group: string;
   created_at: string;
 }
+
+// Single source of truth for where a user lands right after signing in.
+// Admins go to the backend command center; everyone else stays on the
+// public site. Keeping this here means the redirect isn't duplicated across
+// every login entry point.
+export const getPostLoginRedirect = (profile: UserProfile | null): string =>
+  profile?.role === "admin" ? "/admin" : "/";
 
 // Local Demo State Helper for immediate browser responsiveness
 export const getLocalAuthState = (): UserProfile | null => {

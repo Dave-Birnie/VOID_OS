@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { X, Mail, Lock, User, ArrowRight, ShieldCheck } from "lucide-react";
-import { UserProfile, setLocalAuthState, isAdminEmail } from "@/lib/supabase/client";
+import { UserProfile, setLocalAuthState, isAdminEmail, getPostLoginRedirect } from "@/lib/supabase/client";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -21,15 +21,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
 
   if (!isOpen) return null;
 
+  // Finish a successful sign-in: persist the session, notify the parent,
+  // close the modal, and route to the post-login destination. Centralized
+  // so email and OAuth logins always behave identically.
+  const completeLogin = (profile: UserProfile) => {
+    setLocalAuthState(profile);
+    setIsLoading(false);
+    onSuccess(profile);
+    onClose();
+
+    const dest = getPostLoginRedirect(profile);
+    if (typeof window !== "undefined" && window.location.pathname !== dest) {
+      router.push(dest);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     setTimeout(() => {
-      const mockProfile: UserProfile = {
+      const profile: UserProfile = {
         id: "usr_" + Math.random().toString(36).substr(2, 9),
-        email: email || "demo@voidos.io",
-        full_name: name || (email ? email.split("@")[0] : "Demo Member"),
+        email,
+        full_name: name || email.split("@")[0],
         role: isAdminEmail(email) ? "admin" : "user",
         has_dev_pass: true,
         ai_subscription_active: true,
@@ -38,25 +53,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         extra_token_credits: 100000,
       };
 
-      setLocalAuthState(mockProfile);
-      setIsLoading(false);
-      onSuccess(mockProfile);
-      onClose();
-      // Admins go straight to their dashboard after signing in.
-      if (mockProfile.role === "admin") {
-        router.push("/admin");
-      }
+      completeLogin(profile);
     }, 600);
   };
 
   const handleOAuth = (provider: "Google" | "Facebook") => {
     setIsLoading(true);
     setTimeout(() => {
-      const mockProfile: UserProfile = {
+      const oauthEmail = `${provider.toLowerCase()}_user@voidos.io`;
+      const profile: UserProfile = {
         id: "usr_" + Math.random().toString(36).substr(2, 9),
-        email: `${provider.toLowerCase()}_user@voidos.io`,
+        email: oauthEmail,
         full_name: `${provider} User`,
-        role: "user",
+        role: isAdminEmail(oauthEmail) ? "admin" : "user",
         has_dev_pass: true,
         ai_subscription_active: true,
         monthly_token_limit: 500000,
@@ -64,10 +73,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         extra_token_credits: 50000,
       };
 
-      setLocalAuthState(mockProfile);
-      setIsLoading(false);
-      onSuccess(mockProfile);
-      onClose();
+      completeLogin(profile);
     }, 600);
   };
 
@@ -188,7 +194,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
               <input
                 type="email"
                 required
-                placeholder="dave@3amceo.com"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-zinc-800 bg-black/60 text-xs text-white focus:outline-none focus:border-void-purple min-h-[44px]"

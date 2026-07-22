@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { AuthModal } from "@/components/AuthModal";
 import { AdminAiCopilot } from "@/components/AdminAiCopilot";
-import { getLocalAuthState, setLocalAuthState, UserProfile, ChatTranscript, Shoutout } from "@/lib/supabase/client";
+import { getLocalAuthState, setLocalAuthState, isAdminEmail, UserProfile, ChatTranscript, Shoutout } from "@/lib/supabase/client";
 import {
   Shield,
   BarChart3,
@@ -23,6 +24,7 @@ import {
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
+  const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"analytics" | "transcripts" | "copilot" | "cms" | "shoutouts">("analytics");
@@ -52,24 +54,18 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     const existing = getLocalAuthState();
-    if (existing) {
-      setUser(existing);
-    } else {
-      // Set default mock admin profile for demo convenience
-      const mockAdmin: UserProfile = {
-        id: "admin_1",
-        email: "dave@3amceo.com",
-        full_name: "Dave Birnie (Admin)",
-        role: "admin",
-        has_dev_pass: true,
-        ai_subscription_active: true,
-        monthly_token_limit: 1000000,
-        monthly_tokens_used: 124000,
-        extra_token_credits: 500000,
-      };
-      setLocalAuthState(mockAdmin);
-      setUser(mockAdmin);
+
+    // The backend is admin-only. Without an admin session, send visitors back
+    // to the public site instead of fabricating an admin account.
+    if (!existing || !(existing.role === "admin" || isAdminEmail(existing.email))) {
+      router.replace("/");
+      return;
     }
+
+    // Normalize an allowlisted account to the admin role if it isn't already.
+    const admin: UserProfile = existing.role === "admin" ? existing : { ...existing, role: "admin" };
+    if (admin !== existing) setLocalAuthState(admin);
+    setUser(admin);
 
     // Load transcripts from local storage
     if (typeof window !== "undefined") {
@@ -95,7 +91,7 @@ export default function AdminDashboardPage() {
         setTranscripts([sample]);
       }
     }
-  }, []);
+  }, [router]);
 
   const handlePublishDevlog = (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,6 +126,16 @@ export default function AdminDashboardPage() {
       setShoutoutSuccess(false);
     }, 1500);
   };
+
+  // While auth resolves (or a redirect to the public site is in flight),
+  // don't flash the backend to non-admins.
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-mono text-xs text-zinc-500">
+        Verifying admin access…
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col font-mono selection:bg-void-purple selection:text-white">

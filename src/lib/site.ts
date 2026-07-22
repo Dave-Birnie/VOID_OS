@@ -1,14 +1,14 @@
 // Central site configuration used for SEO metadata, structured data,
 // sitemap, and robots. Set NEXT_PUBLIC_SITE_URL in the environment to the
-// canonical production domain (e.g. https://voidos.io); the fallback points
-// at the current live Hostinger domain so metadata resolves to a real URL.
+// canonical production domain; the fallback points at the live Vercel
+// domain so metadata resolves to a real URL even if the env var is missing.
 export const siteConfig = {
   name: "VOID OS",
   shortName: "VOID OS",
   tagline: "The Gamified Life OS You Deploy & Own",
   description:
     "VOID OS is a gamified Life OS and habit-tracking platform with complete data sovereignty. Choose VOID Online — our fully-hosted, ready-to-use plans (from $10/mo) — or self-host the full source code with Supabase, Next.js, and bring-your-own-key AI.",
-  url: (process.env.NEXT_PUBLIC_SITE_URL || "https://silver-crane-475254.hostingersite.com").replace(/\/$/, ""),
+  url: (process.env.NEXT_PUBLIC_SITE_URL || "https://www.voidos.io").replace(/\/$/, ""),
   ogImage: "/og-image.png",
   locale: "en_CA",
   keywords: [
