@@ -102,13 +102,16 @@ export const VisitorAiChatbot: React.FC = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-void-purple via-indigo-600 to-void-cyan text-white font-mono font-bold text-xs shadow-2xl glow-purple hover:scale-105 active:scale-95 transition-all"
+          aria-label="Open Gideon assistant"
+          className="group relative flex flex-col items-center gap-1.5 focus:outline-none"
         >
-          <div className="w-6 h-6 rounded-full bg-black/40 flex items-center justify-center border border-purple-400/40">
-            <Bot className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
-          </div>
-          <span>Chat with Gideon</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span className="relative w-14 h-14 rounded-full bg-gradient-to-br from-void-purple via-indigo-600 to-void-cyan flex items-center justify-center shadow-2xl glow-purple group-hover:scale-105 group-active:scale-95 transition-all">
+            <Bot className="w-7 h-7 text-white" />
+            {/* Online status indicator */}
+            <span className="absolute top-0 right-0 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#100f1a] animate-ping"></span>
+            <span className="absolute top-0 right-0 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#100f1a]"></span>
+          </span>
+          <span className="font-mono font-bold text-[11px] text-white tracking-wide drop-shadow">Gideon</span>
         </button>
       )}
 

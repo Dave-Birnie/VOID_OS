@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { SplashScreen } from "@/components/SplashScreen";
+import { ModeSelect } from "@/components/ModeSelect";
 import { AuthModal } from "@/components/AuthModal";
 import { VisitorAiChatbot } from "@/components/VisitorAiChatbot";
 import { Simulator } from "@/components/Simulator";
 import { AiCreditWidget } from "@/components/AiCreditWidget";
 import { getLocalAuthState, setLocalAuthState, UserProfile } from "@/lib/supabase/client";
 import {
-  Sparkles,
   Gamepad2,
   CheckCircle2,
   Cpu,
@@ -19,12 +19,17 @@ import {
   Zap,
   ArrowRight,
   UserCheck,
-  Star,
-  Flame,
+  CloudCog,
+  Trophy,
+  KeyRound,
+  Terminal,
+  Boxes,
+  Tag,
 } from "lucide-react";
 
 export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
+  const [modeChosen, setModeChosen] = useState(false);
   const [mode, setMode] = useState<"consumer" | "developer">("consumer");
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -40,10 +45,70 @@ export default function HomePage() {
     setUser(null);
   };
 
+  const isDev = mode === "developer";
+
+  // Mode-driven theming: consumer = purple, developer = blue.
+  const t = {
+    wash: isDev ? "mode-wash-developer" : "mode-wash-consumer",
+    blob: isDev ? "bg-void-blue" : "bg-void-purple",
+    badgeBorder: isDev ? "border-blue-500/40" : "border-purple-500/40",
+    badgeBg: isDev ? "bg-blue-950/25" : "bg-purple-950/20",
+    badgeText: isDev ? "text-blue-300" : "text-purple-300",
+    heroGrad: isDev ? "from-void-blue via-sky-400 to-void-cyan" : "from-void-purple via-indigo-400 to-void-cyan",
+    ctaGrad: isDev ? "from-void-blue to-void-cyan" : "from-void-purple to-void-blue",
+    glow: isDev ? "glow-blue" : "glow-purple",
+    accentText: isDev ? "text-void-blue" : "text-void-purple",
+  };
+
+  // Developer pack pricing. Kickstarter prices are limited-time deals;
+  // regular prices apply after the campaign.
+  const devPacks = [
+    {
+      tag: "Starter Self-Host",
+      name: "Kickstarter Pack",
+      ks: 150,
+      regular: 350,
+      blurb: "One standalone app paired with Daily Ops. Full source + BYOK AI integration included.",
+      features: ["1 Modular App + Daily Ops", "Complete source code", "BYOK AI (Claude / OpenAI / Gemini / Grok)"],
+      highlight: false,
+    },
+    {
+      tag: "Pro Self-Host",
+      name: "Extended Bundle",
+      ks: 750,
+      regular: 950,
+      blurb: "All 10 core apps with complete video guides, tutorials, and lifetime updates.",
+      features: ["All 10 Core Apps", "Video guides & tutorials", "Lifetime updates"],
+      highlight: true,
+    },
+    {
+      tag: "Ultimate Suite",
+      name: "15-App Full Bundle",
+      ks: 1250,
+      regular: 1450,
+      blurb: "Everything: the Full Bundle plus all 15 apps and complete AI integration wiring.",
+      features: ["Full Bundle + all 15 Apps", "End-to-end AI integration", "Priority build support"],
+      highlight: false,
+    },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col font-sans selection:bg-void-purple selection:text-white">
+      {/* Mode-tinted background wash */}
+      <div className={`fixed inset-0 -z-10 pointer-events-none transition-colors duration-700 ${t.wash}`} />
+
       {/* Boot sequence splash screen */}
       {showSplash && <SplashScreen onDismiss={() => setShowSplash(false)} />}
+
+      {/* After splash: choose Consumer or Developer (toggle in header still works) */}
+      {!showSplash && !modeChosen && (
+        <ModeSelect
+          onSelect={(m) => {
+            setMode(m);
+            setModeChosen(true);
+          }}
+        />
+      )}
 
       {/* Header Navbar */}
       <Header
@@ -58,36 +123,47 @@ export default function HomePage() {
         {/* HERO SECTION */}
         <section className="max-w-7xl mx-auto px-4 md:px-6 pt-12 md:pt-16 pb-12 text-center relative">
           <div className="absolute inset-0 -z-10 flex items-center justify-center opacity-20 pointer-events-none">
-            <div className="w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-void-purple rounded-full blur-[100px] animate-pulse"></div>
+            <div className={`w-[300px] h-[300px] md:w-[500px] md:h-[500px] ${t.blob} rounded-full blur-[100px] animate-pulse transition-colors duration-700`}></div>
           </div>
 
           {/* Dynamic Mode Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/40 bg-purple-950/20 text-xs text-purple-300 text-glow mb-6 font-mono">
+          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border ${t.badgeBorder} ${t.badgeBg} text-xs ${t.badgeText} text-glow mb-6 font-mono`}>
             <span className="w-2 h-2 rounded-full bg-void-cyan animate-ping"></span>
             <span>
-              {mode === "consumer"
-                ? "CONSUMER MODE: TURNKEY GAMIFIED LIFE OS & SAAS"
-                : "DEVELOPER MODE: SOURCE CODE & SELF-HOSTING PASSES"}
+              {isDev
+                ? "DEVELOPER MODE: SOURCE CODE & SELF-HOSTING PASSES"
+                : "CONSUMER MODE: TURNKEY GAMIFIED LIFE OS & SAAS"}
             </span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight font-mono leading-tight max-w-4xl mx-auto text-white">
-            The Gamified Life OS <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-void-purple via-indigo-400 to-void-cyan">
-              You Deploy & Own.
-            </span>
+            {isDev ? (
+              <>
+                The Gamified Life OS <br />
+                <span className={`bg-clip-text text-transparent bg-gradient-to-r ${t.heroGrad}`}>
+                  You Fork & Self-Host.
+                </span>
+              </>
+            ) : (
+              <>
+                The Gamified Life OS <br />
+                <span className={`bg-clip-text text-transparent bg-gradient-to-r ${t.heroGrad}`}>
+                  You Deploy & Own.
+                </span>
+              </>
+            )}
           </h1>
 
           <p className="mt-6 text-zinc-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-            {mode === "consumer"
-              ? "Ditch expensive subscription habit-trackers. Turnkey cloud Life OS apps with complete data sovereignty and gamified progress loops."
-              : "Complete source code, Supabase database schemas, self-hosting scripts, and unfiltered weekly developer video logs."}
+            {isDev
+              ? "Complete source code, Supabase database schemas, self-hosting scripts, and unfiltered weekly developer video logs — with full data sovereignty and BYOK AI."
+              : "Ditch expensive subscription habit-trackers. Turnkey cloud Life OS apps with complete data sovereignty and gamified progress loops — zero setup required."}
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto sm:max-w-none">
             <button
               onClick={() => setIsAuthOpen(true)}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-mono font-bold text-xs bg-gradient-to-r from-void-purple to-void-blue text-white hover:opacity-95 transition-all glow-purple flex items-center justify-center gap-2 min-h-[44px]"
+              className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-mono font-bold text-xs bg-gradient-to-r ${t.ctaGrad} text-white hover:opacity-95 transition-all ${t.glow} flex items-center justify-center gap-2 min-h-[44px]`}
             >
               <UserCheck className="w-4 h-4" /> Register Free Account
             </button>
@@ -95,7 +171,7 @@ export default function HomePage() {
               href="#pricing-section"
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-mono font-bold text-xs border border-zinc-800 hover:border-purple-500/40 text-zinc-300 hover:text-white transition-all bg-black/40 flex items-center justify-center gap-2 min-h-[44px]"
             >
-              {mode === "consumer" ? "View SaaS Pricing ($10/mo)" : "View Developer Passes ($15+)"}
+              {isDev ? "View Developer Passes ($150+)" : "View SaaS Pricing ($10/mo)"}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -108,23 +184,23 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* DEVELOPER EXCLUSIVE ARCHITECTURE SPECS (ONLY IN DEV MODE) */}
-        {mode === "developer" && (
+        {/* CONSUMER-EXCLUSIVE VALUE GRID */}
+        {!isDev && (
           <section className="max-w-7xl mx-auto px-4 md:px-6 py-6">
-            <div className="bg-zinc-950 border border-cyan-500/30 rounded-2xl p-6 font-mono shadow-2xl">
+            <div className="bg-zinc-950 border border-purple-500/30 rounded-2xl p-6 font-mono shadow-2xl">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-4 mb-4">
                 <div>
-                  <span className="text-[10px] text-void-cyan font-bold uppercase tracking-widest">
-                    SELF-HOSTED ARCHITECTURE
+                  <span className="text-[10px] text-void-purple font-bold uppercase tracking-widest">
+                    ZERO-CONFIG CLOUD SAAS
                   </span>
-                  <h3 className="text-xl font-bold text-white">VOID OS Developer Architecture</h3>
+                  <h3 className="text-xl font-bold text-white">Turnkey. Gamified. Yours.</h3>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-md bg-cyan-950 text-void-cyan text-xs border border-cyan-800">
-                    Supabase RLS
-                  </span>
                   <span className="px-2.5 py-1 rounded-md bg-purple-950 text-purple-300 text-xs border border-purple-800">
-                    Next.js App Router
+                    No Setup
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-pink-950 text-pink-300 text-xs border border-pink-800">
+                    Cancel Anytime
                   </span>
                 </div>
               </div>
@@ -132,6 +208,57 @@ export default function HomePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                 <div className="bg-black/50 p-4 rounded-xl border border-zinc-800">
                   <h4 className="font-bold text-void-purple mb-1 flex items-center gap-1.5">
+                    <Trophy className="w-4 h-4" /> Gamified Progress
+                  </h4>
+                  <p className="text-zinc-400 text-[11px] leading-relaxed">
+                    Earn XP, level up, and clear the Battle Board. Habit-tracking that actually feels rewarding.
+                  </p>
+                </div>
+                <div className="bg-black/50 p-4 rounded-xl border border-zinc-800">
+                  <h4 className="font-bold text-void-pink mb-1 flex items-center gap-1.5">
+                    <CloudCog className="w-4 h-4" /> Hosted For You
+                  </h4>
+                  <p className="text-zinc-400 text-[11px] leading-relaxed">
+                    Cloud sync, backups, and updates handled automatically. Install any modular app in one click.
+                  </p>
+                </div>
+                <div className="bg-black/50 p-4 rounded-xl border border-zinc-800">
+                  <h4 className="font-bold text-void-cyan mb-1 flex items-center gap-1.5">
+                    <Cpu className="w-4 h-4" /> Optional AI Copilot
+                  </h4>
+                  <p className="text-zinc-400 text-[11px] leading-relaxed">
+                    Add server-side AI for +$10/mo with dual credit banks — no API keys to manage.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* DEVELOPER EXCLUSIVE ARCHITECTURE SPECS (ONLY IN DEV MODE) */}
+        {isDev && (
+          <section className="max-w-7xl mx-auto px-4 md:px-6 py-6">
+            <div className="bg-zinc-950 border border-blue-500/30 rounded-2xl p-6 font-mono shadow-2xl">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-4 mb-4">
+                <div>
+                  <span className="text-[10px] text-void-blue font-bold uppercase tracking-widest">
+                    SELF-HOSTED ARCHITECTURE
+                  </span>
+                  <h3 className="text-xl font-bold text-white">VOID OS Developer Architecture</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-1 rounded-md bg-blue-950 text-blue-300 text-xs border border-blue-800">
+                    Supabase RLS
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-cyan-950 text-void-cyan text-xs border border-cyan-800">
+                    Next.js App Router
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div className="bg-black/50 p-4 rounded-xl border border-zinc-800">
+                  <h4 className="font-bold text-void-blue mb-1 flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4" /> Data Sovereignty
                   </h4>
                   <p className="text-zinc-400 text-[11px] leading-relaxed">
@@ -140,7 +267,7 @@ export default function HomePage() {
                 </div>
                 <div className="bg-black/50 p-4 rounded-xl border border-zinc-800">
                   <h4 className="font-bold text-void-cyan mb-1 flex items-center gap-1.5">
-                    <Cpu className="w-4 h-4" /> BYOK AI Integration
+                    <KeyRound className="w-4 h-4" /> BYOK AI Integration
                   </h4>
                   <p className="text-zinc-400 text-[11px] leading-relaxed">
                     Supply your own API key (Claude, OpenAI, Gemini, Grok) to power workflow triggers.
@@ -148,10 +275,10 @@ export default function HomePage() {
                 </div>
                 <div className="bg-black/50 p-4 rounded-xl border border-zinc-800">
                   <h4 className="font-bold text-amber-400 mb-1 flex items-center gap-1.5">
-                    <Video className="w-4 h-4" /> Developer Devlogs
+                    <Terminal className="w-4 h-4" /> Self-Hosting Scripts
                   </h4>
                   <p className="text-zinc-400 text-[11px] leading-relaxed">
-                    Immediate source code packages and weekly YouTube unlisted video logs.
+                    One-command deploy scripts, migration files, and weekly YouTube engineering devlogs.
                   </p>
                 </div>
               </div>
@@ -170,7 +297,7 @@ export default function HomePage() {
                 EXCLUSIVES IN THE LAB
               </span>
               <h2 className="text-2xl md:text-3xl font-black text-white">
-                The $15 "Watch-The-Dev" Builder Pass
+                The $15 &quot;Watch-The-Dev&quot; Builder Pass
               </h2>
               <p className="text-zinc-400 text-xs md:text-sm leading-relaxed">
                 Be part of the active 3amCEO dev ecosystem. Instead of pre-ordering blindly, get lifetime access to the <strong>Watch-the-Dev Portal</strong>.
@@ -179,7 +306,7 @@ export default function HomePage() {
                 <li className="flex items-start gap-2.5 text-zinc-300">
                   <Video className="w-4 h-4 text-void-purple flex-shrink-0 mt-0.5" />
                   <div>
-                    <strong>Weekly Unlisted YouTube Devlogs:</strong> Behind-the-scenes database logic & engineering pipeline videos.
+                    <strong>Weekly Unlisted YouTube Devlogs:</strong> Behind-the-scenes database logic &amp; engineering pipeline videos.
                   </div>
                 </li>
                 <li className="flex items-start gap-2.5 text-zinc-300">
@@ -214,7 +341,7 @@ export default function HomePage() {
 
         {/* PRICING SECTION (CONSUMER VS DEVELOPER MODES) */}
         <section id="pricing-section" className="max-w-7xl mx-auto px-4 md:px-6 py-12 font-mono">
-          {mode === "consumer" ? (
+          {!isDev ? (
             /* CONSUMER MODE: SaaS PRICING TIERS */
             <div>
               <div className="text-center max-w-2xl mx-auto mb-8">
@@ -373,75 +500,67 @@ export default function HomePage() {
             /* DEVELOPER MODE: DEVELOPER & SELF-HOSTER PASSES */
             <div>
               <div className="text-center max-w-2xl mx-auto mb-8">
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white">Developer & Self-Hoster Passes</h2>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white">Developer &amp; Self-Hoster Passes</h2>
                 <p className="text-zinc-400 mt-2 text-xs md:text-sm">
-                  Full source code packages, self-hosting scripts, and complete data sovereignty (BYOK AI model).
+                  One-time purchases with full source code, self-hosting scripts, and complete data sovereignty (BYOK AI model).
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/40 bg-blue-950/25 text-[10px] text-blue-300 uppercase tracking-widest font-bold">
+                  <Tag className="w-3.5 h-3.5" /> Kickstarter prices are limited-time deals
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                {/* Watch The Dev Pass */}
-                <div className="bg-void-card/60 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] text-zinc-500 uppercase font-bold">Watch-The-Dev</span>
-                    <h3 className="text-xl font-bold text-white mt-1">Builder Pass</h3>
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-white">$15</span>
-                      <span className="text-xs text-zinc-400">one-time</span>
-                    </div>
-                    <p className="mt-4 text-xs text-zinc-400 leading-relaxed">
-                      Unfiltered weekly YouTube unlisted devlog videos + engineering blog posts + community chat.
-                    </p>
-                  </div>
-                  <a
-                    href="/dev-journey"
-                    className="mt-8 block w-full py-3 rounded-xl border border-zinc-800 text-center font-bold text-xs text-zinc-300 hover:text-white bg-black/40 min-h-[44px] flex items-center justify-center"
+                {devPacks.map((pack) => (
+                  <div
+                    key={pack.name}
+                    className={`rounded-2xl p-6 flex flex-col justify-between relative transition-all ${
+                      pack.highlight
+                        ? "bg-void-card/80 border border-blue-500/50 shadow-xl glow-blue"
+                        : "bg-void-card/60 border border-zinc-800 hover:border-blue-500/40"
+                    }`}
                   >
-                    Get Builder Pass
-                  </a>
-                </div>
+                    {pack.highlight && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-void-blue text-white text-[9px] font-bold uppercase tracking-wider whitespace-nowrap">
+                        BEST VALUE
+                      </span>
+                    )}
+                    <div>
+                      <span className="text-[10px] text-blue-400 uppercase font-bold">{pack.tag}</span>
+                      <h3 className="text-xl font-bold text-white mt-1">{pack.name}</h3>
 
-                {/* Modular Pass */}
-                <div className="bg-void-card/60 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] text-zinc-500 uppercase font-bold">Modular Self-Host</span>
-                    <h3 className="text-xl font-bold text-white mt-1">Modular Pass</h3>
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-white">$100</span>
-                      <span className="text-xs text-zinc-400">one-time</span>
-                    </div>
-                    <p className="mt-4 text-xs text-zinc-400 leading-relaxed">
-                      One standalone app paired with Daily Ops. BYOK AI integration included.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setIsAuthOpen(true)}
-                    className="mt-8 w-full py-3 rounded-xl border border-zinc-800 text-center font-bold text-xs text-zinc-300 hover:text-white bg-black/40 min-h-[44px]"
-                  >
-                    Get Modular Pass
-                  </button>
-                </div>
+                      <div className="mt-4 flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-white">${pack.ks.toLocaleString()}</span>
+                        <span className="text-xs text-zinc-500 line-through">${pack.regular.toLocaleString()}</span>
+                      </div>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="inline-block px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[9px] font-bold uppercase tracking-wide">
+                          Kickstarter Deal
+                        </span>
+                        <span className="text-[9px] text-zinc-500">${pack.regular.toLocaleString()} after campaign</span>
+                      </div>
 
-                {/* Extended Bundle */}
-                <div className="bg-void-card/60 border border-cyan-500/40 rounded-2xl p-6 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] text-void-cyan uppercase font-bold">Full Bundle</span>
-                    <h3 className="text-xl font-bold text-white mt-1">Extended Bundle</h3>
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-white">$750</span>
-                      <span className="text-xs text-zinc-400">one-time</span>
+                      <p className="mt-4 text-xs text-zinc-400 leading-relaxed">{pack.blurb}</p>
+
+                      <ul className="mt-6 space-y-3 text-xs text-zinc-300">
+                        {pack.features.map((f) => (
+                          <li key={f} className="flex items-center gap-2">
+                            <Boxes className="w-4 h-4 text-void-blue flex-shrink-0" /> {f}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <p className="mt-4 text-xs text-zinc-400 leading-relaxed">
-                      All 10 core apps + complete video guides/tutorials + lifetime updates.
-                    </p>
+                    <button
+                      onClick={() => setIsAuthOpen(true)}
+                      className={`mt-8 w-full py-3 rounded-xl font-bold text-xs min-h-[44px] transition-all ${
+                        pack.highlight
+                          ? "bg-gradient-to-r from-void-blue to-void-cyan text-white glow-blue"
+                          : "border border-zinc-800 hover:border-blue-500/40 text-zinc-300 hover:text-white bg-black/40"
+                      }`}
+                    >
+                      Get {pack.name}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setIsAuthOpen(true)}
-                    className="mt-8 w-full py-3 rounded-xl bg-void-cyan text-slate-950 font-bold text-xs min-h-[44px]"
-                  >
-                    Get Full Bundle
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
           )}
