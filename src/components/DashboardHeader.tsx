@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, Home } from "lucide-react";
+import { LogOut, Home, Settings } from "lucide-react";
 import { ModeSwitch } from "@/components/ModeSwitch";
 import { NotificationBell, type AppNotification } from "@/components/NotificationBell";
 import { createBrowserSupabase } from "@/lib/supabase/client";
@@ -50,6 +50,14 @@ export function DashboardHeader({
           {isAdmin && <ModeSwitch />}
           <span className="hidden md:inline text-xs font-mono text-zinc-400">{name}</span>
           <NotificationBell notifications={notifications} />
+          <Link
+            href="/dashboard/settings"
+            title="Settings"
+            aria-label="Settings"
+            className="p-2 rounded-xl border border-zinc-800 hover:border-void-purple/50 text-zinc-400 hover:text-white transition-all bg-black/30"
+          >
+            <Settings className="w-4 h-4" aria-hidden="true" />
+          </Link>
           <Link
             href="/"
             title="View public site"
