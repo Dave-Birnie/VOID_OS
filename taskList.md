@@ -62,7 +62,24 @@ Users can rename any app (stored in `app_settings.app_names`). IDs are fixed.
 - DB migrations applied to the live `davidbirnie-site` Supabase project (shared with VOID for now).
 - Each phase ships as its own PR, squash-merged to `main` → Vercel deploy.
 
+## Scope decisions (from Master Plan v3)
+- **No Stripe / no in-app billing** in this project — Kickstarter handles pledges.
+  Stripe belongs to a future standalone-SaaS phase only. `.env.example` has no
+  STRIPE_* vars.
+- **AI = BYOK, any provider** (`AI_PROVIDER` / `AI_API_KEY` per-user encrypted /
+  `AI_MODEL`) via a shared `callAI()` adapter. No shared server-paid key.
+- **Landing pricing = 6-tier Kickstarter structure** ($10/$25/$150/$350-450/$999/$2,500) — done.
+- **Dual stack**: PHP (FamilyLock) for lower tiers, Next.js/Supabase/Vercel for AI/CMS tiers.
+
+## FamilyLock repo findings (answers to the plan's open questions)
+- Hosting: **shared hosting** (localhost MySQL, cPanel/.htaccess). PHP shared
+  hosting *can* still run server-side DB/auth + receive webhooks; the real limit
+  is the Next.js runtime.
+- DB access: **server-side & safe** — PDO prepared statements, no client creds.
+- Multi-user: **one codebase, multi-tenant**, keyed by `user_id`; `add-user.php`
+  + shared users table w/ `subdomain` + `role_id`; PHP sessions + bcrypt.
+
 ## Known follow-ups / tech debt
 - VOID shares the `davidbirnie-site` Supabase project — eventually give VOID its own.
 - The 16 apps themselves are placeholders; real app builds are separate work (see mytodo.md).
-- Gideon uses canned responses until wired to real Gemini.
+- Gideon uses canned responses until wired to real BYOK AI (shared callAI adapter).
