@@ -5,12 +5,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogOut, Home } from "lucide-react";
 import { ModeSwitch } from "@/components/ModeSwitch";
+import { NotificationBell, type AppNotification } from "@/components/NotificationBell";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
-// Chrome for the member dashboard: brand, admin-only CMS toggle, view-site
-// link, and sign out.
-export function DashboardHeader({ isAdmin, name }: { isAdmin: boolean; name: string }) {
+// Chrome for the member dashboard: brand, admin-only CMS toggle, notifications,
+// view-site link, and sign out.
+export function DashboardHeader({
+  isAdmin,
+  name,
+  notifications,
+}: {
+  isAdmin: boolean;
+  name: string;
+  notifications: AppNotification[];
+}) {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -40,6 +49,7 @@ export function DashboardHeader({ isAdmin, name }: { isAdmin: boolean; name: str
         <div className="flex items-center gap-2 md:gap-3">
           {isAdmin && <ModeSwitch />}
           <span className="hidden md:inline text-xs font-mono text-zinc-400">{name}</span>
+          <NotificationBell notifications={notifications} />
           <Link
             href="/"
             title="View public site"

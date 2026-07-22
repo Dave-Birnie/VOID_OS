@@ -41,13 +41,13 @@ Users can rename any app (stored in `app_settings.app_names`). IDs are fixed.
   - [ ] **Adjustable widget board** with **"Edit Layout" FAB** (FamilyLock style — drag/hide controls hidden until edit mode). Reorder + hide/show + (optional) resize, persisted to `app_settings`.
   - [ ] **Life Stats** widget (6 areas: Spiritual/Love/Work/Focus/Mind/Strength, RPG-style with levels). Placeholder values until source apps exist.
   - [ ] Today View widget
-- [ ] **Phase 3 — Gideon in the dashboard**
-  - [ ] Member-facing Gideon assistant (reuse VisitorAiChatbot/AdminAiCopilot pattern) wired into the dashboard
-  - [ ] Real Gemini call (BYOK via settings) — currently canned responses
-- [ ] **Phase 4 — Notifications & Alerts**
-  - [ ] `notifications` table (per-user) + RLS
-  - [ ] Notification bell + popup on the dashboard
-  - [ ] **Shoutout → notification fan-out**: sending a shoutout creates a notification for every user; popup toast on next load
+- [x] **Phase 3 — Gideon in the dashboard**
+  - [x] Member-facing Gideon assistant (floating dock) wired into the dashboard
+  - [ ] Real BYOK AI call (shared callAI adapter) — currently canned responses
+- [x] **Phase 4 — Notifications & Alerts**
+  - [x] `notifications` table (per-user) + RLS
+  - [x] Notification bell + auto-toast popup on the dashboard
+  - [x] **Shoutout → notification fan-out** via `broadcast_notification()` SECURITY DEFINER RPC; toast on next load
   - [ ] Daily nudge hooks (overdue/streak) — later, needs real apps
 - [ ] **Phase 5 — Settings**
   - [ ] Appearance (theme/font/density/reduced-motion) + CSS theme system (`data-theme`)
