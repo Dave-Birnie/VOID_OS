@@ -9,11 +9,16 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 interface HeaderProps {
   mode: "consumer" | "developer";
-  onModeChange: (mode: "consumer" | "developer") => void;
+  // Optional so the Header can be rendered from Server Components (gated
+  // member pages) where no client mode-toggle handler is passed.
+  onModeChange?: (mode: "consumer" | "developer") => void;
+  // Fired when the logo or Overview is clicked (used on the landing page to
+  // reset back to Consumer view). Optional on pages where it doesn't apply.
+  onHome?: () => void;
   user: UserProfile | null;
 }
 
-export const Header: React.FC<HeaderProps> = ({ mode, onModeChange, user }) => {
+export const Header: React.FC<HeaderProps> = ({ mode, onModeChange, onHome, user }) => {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -28,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({ mode, onModeChange, user }) => {
     <header className="sticky top-0 z-40 backdrop-blur-md bg-void-black/80 border-b border-zinc-800/80 py-3.5 px-4 md:px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand Logo & Name */}
-        <Link href="/" aria-label="VOID OS home" className="flex items-center gap-3 group">
+        <Link href="/" aria-label="VOID OS home" onClick={onHome} className="flex items-center gap-3 group">
           <div className="w-9 h-9 relative">
             <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false" className="w-full h-full drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:scale-105 transition-transform">
               <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" strokeWidth="12"/>
@@ -50,21 +55,26 @@ export const Header: React.FC<HeaderProps> = ({ mode, onModeChange, user }) => {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-6 text-xs font-mono text-zinc-300">
-          <Link href="/" className="hover:text-void-purple transition-colors">
+          <Link href="/" onClick={onHome} className="hover:text-void-purple transition-colors">
             Overview
           </Link>
           <Link href="/blog" className="flex items-center gap-1.5 hover:text-void-purple transition-colors">
             <FileText className="w-3.5 h-3.5 text-void-purple" aria-hidden="true" />
             Blog
           </Link>
-          <Link href="/dev-journey" className="flex items-center gap-1.5 hover:text-void-cyan transition-colors">
-            <Video className="w-3.5 h-3.5 text-void-purple" />
-            Dev Journey
-          </Link>
-          <Link href="/community-chat" className="flex items-center gap-1.5 hover:text-void-pink transition-colors">
-            <MessageSquare className="w-3.5 h-3.5 text-void-pink" />
-            Community Chat
-          </Link>
+          {/* Members-only areas — shown to signed-in accounts only */}
+          {user && (
+            <>
+              <Link href="/dev-journey" className="flex items-center gap-1.5 hover:text-void-cyan transition-colors">
+                <Video className="w-3.5 h-3.5 text-void-purple" />
+                Dev Journey
+              </Link>
+              <Link href="/community-chat" className="flex items-center gap-1.5 hover:text-void-pink transition-colors">
+                <MessageSquare className="w-3.5 h-3.5 text-void-pink" />
+                Community Chat
+              </Link>
+            </>
+          )}
           {user?.role === "admin" && (
             <Link href="/admin" className="flex items-center gap-1.5 text-amber-400 font-bold hover:text-amber-300 transition-colors">
               <Shield className="w-3.5 h-3.5 text-amber-400" />
@@ -78,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({ mode, onModeChange, user }) => {
           {/* CONSUMER vs DEVELOPER Mode Toggle */}
           <div className="bg-zinc-900/90 p-1 rounded-full border border-zinc-800 flex items-center shadow-inner">
             <button
-              onClick={() => onModeChange("consumer")}
+              onClick={() => onModeChange?.("consumer")}
               aria-label="Switch to Consumer mode"
               aria-pressed={mode === "consumer"}
               className={`px-3 py-1 md:px-3.5 md:py-1 rounded-full text-[10px] md:text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
@@ -90,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({ mode, onModeChange, user }) => {
               <User className="w-3 h-3" aria-hidden="true" /> <span className="hidden sm:inline">Consumer</span>
             </button>
             <button
-              onClick={() => onModeChange("developer")}
+              onClick={() => onModeChange?.("developer")}
               aria-label="Switch to Developer mode"
               aria-pressed={mode === "developer"}
               className={`px-3 py-1 md:px-3.5 md:py-1 rounded-full text-[10px] md:text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${

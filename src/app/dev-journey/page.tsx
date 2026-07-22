@@ -1,55 +1,30 @@
-"use client";
-
-import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { getUserAndProfile } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import { Header } from "@/components/Header";
 import { VisitorAiChatbot } from "@/components/VisitorAiChatbot";
-import { DevlogEntry } from "@/lib/supabase/client";
-import { useSessionProfile } from "@/lib/useSessionProfile";
+import type { DevlogEntry } from "@/lib/supabase/client";
 import { Video, Lock, Unlock, ArrowLeft } from "lucide-react";
 
-export default function DevJourneyPage() {
-  const router = useRouter();
-  const { profile: user } = useSessionProfile();
-  const isUnlocked = !!(user && (user.has_dev_pass || user.role === "admin"));
+// Where the "unlock" CTA sends members to back the campaign. Payment happens on
+// Kickstarter; an admin then grants the Dev Pass from the admin dashboard.
+const KICKSTARTER_URL = process.env.NEXT_PUBLIC_KICKSTARTER_URL || "#";
 
-  const devlogs: DevlogEntry[] = [
-    {
-      id: "1",
-      title: "Devlog #14: Architecture of VOID OS, Supabase RLS & Dual AI Banks",
-      slug: "devlog-14-architecture-ai-banks",
-      content_md: `Welcome to Devlog #14! In this post and unlisted video, we walk through how we built the **Next.js + Supabase + Tailwind CSS** architecture for VOID OS.
+export default async function DevJourneyPage() {
+  // Middleware guarantees a signed-in user reaches this page.
+  const { profile } = await getUserAndProfile();
+  const hasPass = !!(profile && (profile.has_dev_pass || profile.role === "admin"));
 
-### Key Topics Covered Today:
-1. **Data Sovereignty:** Structuring Supabase PostgreSQL schemas with Row Level Security (RLS) so users own their habit data.
-2. **Dual Credit-Bank AI Tracking:** Implementing Bank 1 (Monthly Token Allowance) and Bank 2 (Non-expiring Top-Up Credits) for the $10/mo VOID Online AI Upgrade.
-3. **Gideon Public & Admin AI Assistant:** Wiring transcript logging for visitor objection analytics.`,
-      youtube_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      is_locked: true,
-      created_at: "2026-07-21",
-    },
-    {
-      id: "2",
-      title: "Devlog #13: Daily Ops & Battle Board Simulator Engine",
-      slug: "devlog-13-daily-ops-battle-board",
-      content_md: `In Devlog #13, we break down the modular engine powering the Daily Ops task runner and the 4x3 Battle Board Bingo grid. We cover touch target optimization, XP math formulas, and streak counters!`,
-      youtube_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      is_locked: true,
-      created_at: "2026-07-14",
-    },
-  ];
-
-  // Signed-out visitors get sent to sign in; signed-in users without a pass go
-  // to the pricing section to purchase one (real entitlement lives on the
-  // profile's has_dev_pass flag).
-  const handleUnlock = () => {
-    router.push(user ? "/#pricing-section" : "/login?next=/dev-journey");
-  };
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("devlogs")
+    .select("*")
+    .order("created_at", { ascending: false });
+  const devlogs = (data as DevlogEntry[]) ?? [];
 
   return (
     <div className="min-h-screen flex flex-col font-mono selection:bg-void-purple selection:text-white">
-      <Header mode="developer" onModeChange={() => {}} user={user} />
+      <Header mode="developer" user={profile} />
 
       <main id="main-content" className="flex-1 max-w-7xl mx-auto px-4 md:px-6 py-10 w-full">
         <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-white mb-6">
@@ -61,49 +36,54 @@ export default function DevJourneyPage() {
             <div className="flex items-center gap-2 text-void-purple font-bold text-xs uppercase tracking-widest">
               <Video className="w-4 h-4 text-purple-400" /> Watch-The-Dev Portal
             </div>
-            <h1 className="text-2xl md:text-4xl font-black text-white mt-1">Dave's Developer Journey</h1>
+            <h1 className="text-2xl md:text-4xl font-black text-white mt-1">Dave&apos;s Developer Journey</h1>
             <p className="text-zinc-400 text-xs md:text-sm mt-1">
               Unfiltered video devlogs, unlisted YouTube deep dives, and written engineering logs.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            {isUnlocked ? (
+            {hasPass ? (
               <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
                 <Unlock className="w-4 h-4 text-emerald-400" /> Pass Unlocked
               </span>
             ) : (
-              <button
-                onClick={handleUnlock}
+              <a
+                href={KICKSTARTER_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-5 py-2.5 rounded-full bg-gradient-to-r from-void-purple to-void-blue text-white font-bold text-xs glow-purple hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5"
               >
-                <Lock className="w-4 h-4" /> Unlock Builder Pass ($15)
-              </button>
+                <Lock className="w-4 h-4" /> Back the Builder Pass on Kickstarter
+              </a>
             )}
           </div>
         </div>
+
+        {devlogs.length === 0 && (
+          <p className="text-sm text-zinc-500">No devlogs published yet. Check back soon.</p>
+        )}
 
         {/* Devlog Entries Feed */}
         <div className="space-y-8">
           {devlogs.map((log) => (
             <article key={log.id} className="bg-[#100f1a] border border-zinc-800 rounded-3xl p-6 md:p-8 shadow-2xl relative">
               <div className="flex items-center justify-between text-xs text-zinc-500 mb-3">
-                <span className="text-void-cyan font-bold">{log.created_at}</span>
+                <span className="text-void-cyan font-bold">{log.created_at?.slice(0, 10)}</span>
                 <span className="px-2.5 py-0.5 rounded bg-purple-500/10 text-purple-300 text-[10px]">Weekly Video Devlog</span>
               </div>
 
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4">{log.title}</h2>
 
-              {/* Video Player Box */}
               <div className="relative rounded-2xl overflow-hidden bg-black border border-zinc-800 aspect-video mb-6 flex items-center justify-center">
-                {isUnlocked ? (
+                {hasPass && log.youtube_url ? (
                   <iframe
                     src={log.youtube_url}
                     title={log.title}
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                  ></iframe>
+                  />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col items-center justify-center p-6 text-center backdrop-blur-md">
                     <div className="w-14 h-14 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center mb-3">
@@ -111,22 +91,30 @@ export default function DevJourneyPage() {
                     </div>
                     <h3 className="text-lg font-bold text-white">Devlog Locked</h3>
                     <p className="text-xs text-zinc-400 max-w-md mt-1 mb-4">
-                      Unlock the $15 Watch-the-Dev Builder Pass to view unfiltered YouTube unlisted video logs and engineering tutorials.
+                      Back the Watch-the-Dev Builder Pass on Kickstarter to unlock every unlisted video log and engineering write-up. Access is granted to your account once your pledge is confirmed.
                     </p>
-                    <button
-                      onClick={handleUnlock}
+                    <a
+                      href={KICKSTARTER_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="px-6 py-3 rounded-xl bg-void-purple hover:bg-purple-600 text-white font-bold text-xs glow-purple transition-all"
                     >
-                      Unlock Pass for $15
-                    </button>
+                      Back it on Kickstarter
+                    </a>
                   </div>
                 )}
               </div>
 
-              {/* Written Blog Markdown Content */}
-              <div className={`prose prose-invert max-w-none text-xs md:text-sm text-zinc-300 leading-relaxed ${!isUnlocked ? "blur-sm select-none" : ""}`}>
-                <div className="whitespace-pre-line">{log.content_md}</div>
-              </div>
+              {/* Written content only rendered for pass holders */}
+              {hasPass ? (
+                <div className="prose prose-invert max-w-none text-xs md:text-sm text-zinc-300 leading-relaxed">
+                  <div className="whitespace-pre-line">{log.content_md}</div>
+                </div>
+              ) : (
+                <p className="text-xs text-zinc-500 italic">
+                  The full written deep-dive unlocks with the Builder Pass.
+                </p>
+              )}
             </article>
           ))}
         </div>

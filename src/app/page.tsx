@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { SplashScreen } from "@/components/SplashScreen";
@@ -31,13 +31,30 @@ import {
 
 export default function HomePage() {
   const router = useRouter();
-  const [showSplash, setShowSplash] = useState(true);
-  const [modeChosen, setModeChosen] = useState(false);
+  const [showSplash, setShowSplash] = useState(false);
+  const [modeChosen, setModeChosen] = useState(true);
   const [mode, setMode] = useState<"consumer" | "developer">("consumer");
   const [includeAiUpgrade, setIncludeAiUpgrade] = useState(true);
 
   // Real Supabase session (replaces the old localStorage demo state).
   const { profile: user } = useSessionProfile();
+
+  // Splash + path-select are a one-time intro. The splash is marked seen the
+  // moment it's dismissed, so it can never reappear on the site again.
+  useEffect(() => {
+    if (!localStorage.getItem("void_os_splash_seen")) setShowSplash(true);
+    if (!localStorage.getItem("void_os_onboarded")) setModeChosen(false);
+  }, []);
+
+  const dismissSplash = () => {
+    localStorage.setItem("void_os_splash_seen", "1");
+    setShowSplash(false);
+  };
+
+  const finishOnboarding = () => {
+    localStorage.setItem("void_os_onboarded", "1");
+    setModeChosen(true);
+  };
 
   const goToLogin = () => router.push("/login");
 
@@ -102,21 +119,26 @@ export default function HomePage() {
       {/* Mode-tinted background wash */}
       <div className={`fixed inset-0 -z-10 pointer-events-none transition-colors duration-700 ${t.wash}`} />
 
-      {/* Boot sequence splash screen */}
-      {showSplash && <SplashScreen onDismiss={() => setShowSplash(false)} />}
+      {/* Boot sequence splash screen — first visit only */}
+      {showSplash && <SplashScreen onDismiss={dismissSplash} />}
 
-      {/* After splash: choose Consumer or Developer (toggle in header still works) */}
+      {/* After splash: choose Consumer or Developer (first visit only) */}
       {!showSplash && !modeChosen && (
         <ModeSelect
           onSelect={(m) => {
             setMode(m);
-            setModeChosen(true);
+            finishOnboarding();
           }}
         />
       )}
 
-      {/* Header Navbar */}
-      <Header mode={mode} onModeChange={(m) => setMode(m)} user={user} />
+      {/* Header Navbar — logo & Overview reset to Consumer view */}
+      <Header
+        mode={mode}
+        onModeChange={(m) => setMode(m)}
+        onHome={() => setMode("consumer")}
+        user={user}
+      />
 
       <main id="main-content" className="flex-1">
         {/* HERO SECTION */}

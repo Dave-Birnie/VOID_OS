@@ -8,15 +8,21 @@ import {
 
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
-// Gates the admin backend and keeps the auth session fresh. Role is checked in
-// the /admin layout; here we only enforce "signed in". Mirrors the 3amCEO
-// backend pattern.
+// Gates the member area (admin backend + logged-in-only pages) and keeps the
+// auth session fresh. Admin role is checked in the /admin layout; here we only
+// enforce "signed in". Mirrors the 3amCEO backend pattern.
 export async function middleware(request: NextRequest) {
-  const isAdminArea = request.nextUrl.pathname.startsWith("/admin");
+  const { pathname } = request.nextUrl;
+  // Pages that require a logged-in account (any member). Community Chat and the
+  // Dev Journey portal are member-only; /admin additionally requires admin role.
+  const requiresAuth =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/community-chat") ||
+    pathname.startsWith("/dev-journey");
 
-  // Backend not wired up yet: keep public pages working, park the admin area.
+  // Backend not wired up yet: keep public pages working, park gated pages.
   if (!isSupabaseConfigured()) {
-    if (isAdminArea) {
+    if (requiresAuth) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
     return NextResponse.next();
@@ -47,13 +53,13 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (isAdminArea && !user) {
+  if (requiresAuth && !user) {
     const url = new URL("/login", request.url);
-    url.searchParams.set("next", request.nextUrl.pathname);
+    url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
 
-  if (request.nextUrl.pathname === "/login" && user) {
+  if (pathname === "/login" && user) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
 
@@ -61,5 +67,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login"],
+  matcher: [
+    "/admin/:path*",
+    "/community-chat/:path*",
+    "/dev-journey/:path*",
+    "/login",
+  ],
 };

@@ -20,6 +20,7 @@ import {
   Plus,
   CheckCircle2,
   HelpCircle,
+  Inbox,
 } from "lucide-react";
 
 interface AdminDashboardProps {
@@ -103,20 +104,39 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, transcript
           <ArrowLeft className="w-4 h-4" /> Back to Overview
         </Link>
 
-        {/* Blog CMS entry point */}
-        <Link
-          href="/admin/blog"
-          className="flex items-center justify-between gap-3 mb-6 px-5 py-4 rounded-2xl bg-gradient-to-r from-purple-950/40 to-cyan-950/30 border border-purple-500/30 hover:border-purple-500/60 transition-all"
-        >
-          <span className="flex items-center gap-3">
-            <FileText className="w-5 h-5 text-void-purple" />
+        {/* Backend section entry points */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <Link
+            href="/admin/blog"
+            className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-gradient-to-r from-purple-950/40 to-cyan-950/30 border border-purple-500/30 hover:border-purple-500/60 transition-all"
+          >
+            <FileText className="w-5 h-5 text-void-purple flex-shrink-0" />
             <span>
               <span className="block text-sm font-bold text-white">Blog CMS</span>
-              <span className="block text-[11px] text-zinc-400">Write, edit, and publish SEO blog posts</span>
+              <span className="block text-[11px] text-zinc-400">Write &amp; publish posts</span>
             </span>
-          </span>
-          <span className="text-void-cyan text-xs font-bold">Open →</span>
-        </Link>
+          </Link>
+          <Link
+            href="/admin/members"
+            className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-gradient-to-r from-purple-950/40 to-cyan-950/30 border border-purple-500/30 hover:border-purple-500/60 transition-all"
+          >
+            <Users className="w-5 h-5 text-void-purple flex-shrink-0" />
+            <span>
+              <span className="block text-sm font-bold text-white">Members</span>
+              <span className="block text-[11px] text-zinc-400">Grant Dev Pass &amp; roles</span>
+            </span>
+          </Link>
+          <Link
+            href="/admin/inbox"
+            className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-gradient-to-r from-purple-950/40 to-cyan-950/30 border border-purple-500/30 hover:border-purple-500/60 transition-all"
+          >
+            <Inbox className="w-5 h-5 text-void-purple flex-shrink-0" />
+            <span>
+              <span className="block text-sm font-bold text-white">Inbox</span>
+              <span className="block text-[11px] text-zinc-400">Reply to member DMs</span>
+            </span>
+          </Link>
+        </div>
 
         {/* Dashboard Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-6 mb-8">
