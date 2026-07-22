@@ -44,6 +44,24 @@ export async function sendShoutout(formData: FormData): Promise<ActionResult> {
   return { ok: true };
 }
 
+// Save the inspirations doc (verses + quotes) that rotates in everyone's
+// Today View. Stored in site_content under the `inspirations` key.
+export async function saveInspirations(formData: FormData): Promise<ActionResult> {
+  const gate = await requireAdmin();
+  if (!gate.ok) return { ok: false, error: "Not authorized." };
+
+  const body = ((formData.get("body") as string) ?? "").slice(0, 100000);
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("site_content")
+    .upsert({ key: "inspirations", body, updated_at: new Date().toISOString() }, { onConflict: "key" });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/inspirations");
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
 // Publish a devlog entry to the Watch-the-Dev portal.
 export async function publishDevlog(formData: FormData): Promise<ActionResult> {
   const gate = await requireAdmin();

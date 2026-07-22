@@ -151,10 +151,8 @@ export function WidgetBoard({
       <button
         type="button"
         onClick={toggleEditing}
-        className={`fixed right-5 bottom-5 z-50 rounded-full px-4 py-3 text-xs font-bold flex items-center gap-2 shadow-2xl transition-all hover:-translate-y-0.5 ${
-          editing
-            ? "bg-gradient-to-r from-emerald-500 to-void-cyan text-slate-950"
-            : "bg-gradient-to-r from-void-purple to-void-blue text-white glow-purple"
+        className={`fixed right-4 bottom-4 z-50 rounded-full px-3.5 py-2.5 text-xs font-bold flex items-center gap-1.5 shadow-2xl transition-all hover:-translate-y-0.5 ${
+          editing ? "bg-emerald-500 text-slate-950" : "themed-accent-bg"
         }`}
       >
         {editing ? <Check className="w-4 h-4" /> : <LayoutGrid className="w-4 h-4" />}

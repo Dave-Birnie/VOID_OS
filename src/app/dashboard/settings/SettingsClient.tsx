@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Check, Palette, User, Cpu } from "lucide-react";
+import { ArrowLeft, Check, Palette, User, Cpu, Sparkles } from "lucide-react";
 import { THEMES, applyTheme, type ThemeId } from "@/lib/theme";
-import { saveAppearance, saveAccount, saveAiProvider } from "./actions";
+import { saveAppearance, saveAccount, saveAiProvider, saveTodayPrefs } from "./actions";
 
 export interface SettingsInitial {
   full_name: string;
@@ -13,6 +13,8 @@ export interface SettingsInitial {
   timezone: string;
   theme: ThemeId;
   font_size: "s" | "m" | "l";
+  show_verses: boolean;
+  show_quotes: boolean;
   ai_provider: string;
   ai_model: string;
   ai_has_key: boolean;
@@ -61,6 +63,7 @@ export function SettingsClient({ initial }: { initial: SettingsInitial }) {
 
   const [acStatus, setAcStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [aiStatus, setAiStatus] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [tvStatus, setTvStatus] = useState<{ ok: boolean; msg: string } | null>(null);
 
   const pickTheme = (id: ThemeId) => {
     setTheme(id);
@@ -88,6 +91,13 @@ export function SettingsClient({ initial }: { initial: SettingsInitial }) {
     e.preventDefault();
     const res = await saveAiProvider(new FormData(e.target as HTMLFormElement));
     setAiStatus(res.ok ? { ok: true, msg: "AI provider saved." } : { ok: false, msg: res.error ?? "Failed." });
+    router.refresh();
+  };
+
+  const submitToday = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await saveTodayPrefs(new FormData(e.target as HTMLFormElement));
+    setTvStatus(res.ok ? { ok: true, msg: "Today View saved." } : { ok: false, msg: res.error ?? "Failed." });
     router.refresh();
   };
 
@@ -145,6 +155,23 @@ export function SettingsClient({ initial }: { initial: SettingsInitial }) {
               Save appearance
             </button>
             <Status s={apStatus} />
+          </form>
+        </Section>
+
+        {/* Today View */}
+        <Section icon={<Sparkles className="w-5 h-5" />} title="Today View">
+          <p className="text-xs themed-muted mb-4">Daily encouragement shown on your dashboard&apos;s Today View widget.</p>
+          <form onSubmit={submitToday} className="space-y-3">
+            <label className="flex items-center gap-2.5 text-sm themed-text">
+              <input type="checkbox" name="verses" defaultChecked={initial.show_verses} className="w-4 h-4 rounded accent-[var(--accent)]" />
+              Show a daily <strong>scripture verse</strong>
+            </label>
+            <label className="flex items-center gap-2.5 text-sm themed-text">
+              <input type="checkbox" name="quotes" defaultChecked={initial.show_quotes} className="w-4 h-4 rounded accent-[var(--accent)]" />
+              Show a daily <strong>motivational quote</strong>
+            </label>
+            <button type="submit" className="px-5 py-2.5 rounded-xl themed-accent-bg font-bold text-xs">Save Today View</button>
+            <Status s={tvStatus} />
           </form>
         </Section>
 
