@@ -151,8 +151,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-void-black text-slate-100 font-sans antialiased grid-bg selection:bg-void-purple selection:text-white">
+    <html lang="en" data-theme="dark" className="dark">
+      <body className="text-slate-100 font-sans antialiased grid-bg selection:bg-void-purple selection:text-white">
+        {/* Apply the saved theme before paint to avoid a flash of the default. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('void_os_theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}`,
+          }}
+        />
         {/* Skip link for keyboard & screen-reader users (WCAG 2.4.1) */}
         <a href="#main-content" className="skip-link">
           Skip to main content

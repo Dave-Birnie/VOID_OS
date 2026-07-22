@@ -49,11 +49,13 @@ Users can rename any app (stored in `app_settings.app_names`). IDs are fixed.
   - [x] Notification bell + auto-toast popup on the dashboard
   - [x] **Shoutout → notification fan-out** via `broadcast_notification()` SECURITY DEFINER RPC; toast on next load
   - [ ] Daily nudge hooks (overdue/streak) — later, needs real apps
-- [ ] **Phase 5 — Settings**
-  - [ ] Appearance (theme/font/density/reduced-motion) + CSS theme system (`data-theme`)
-  - [ ] Account (nickname/timezone)
-  - [ ] AI Providers (BYOK keys — Gemini/Claude/OpenAI/Grok), shared `callAI` adapter
-  - [ ] Notifications prefs, Privacy & Data
+- [x] **Phase 5 — Settings**
+  - [x] Appearance: theme system (`data-theme` + CSS vars, no-flash) — Dark / Light / **Void** (black/gray/silver/gold) + font size
+  - [x] Account (display name / nickname / timezone)
+  - [x] AI Providers (BYOK: provider + model + key stored in app_settings)
+  - [ ] Shared `callAI()` adapter that actually uses the BYOK key (wires Gideon + Command Brief)
+  - [ ] Notifications prefs + Privacy & Data section
+  - [ ] Deep light-mode polish across legacy components (marketing/CMS still fixed-dark; dashboard + settings are themed)
 - [ ] **Cross-cutting**
   - [ ] Dev Journey ("Watch the Journey") + Community Chat ("Chat with Dev") surfaced as dashboard entry points, gated by `has_dev_pass`
   - [ ] `NEXT_PUBLIC_KICKSTARTER_URL` used for unlock CTAs
