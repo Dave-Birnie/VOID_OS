@@ -32,6 +32,14 @@ export async function sendShoutout(formData: FormData): Promise<ActionResult> {
   });
   if (error) return { ok: false, error: error.message };
 
+  // Fan the shoutout out to every user's notification feed (pops up on their
+  // dashboard). Best-effort — a notification failure shouldn't fail the shoutout.
+  await supabase.rpc("broadcast_notification", {
+    p_title: title.slice(0, 200),
+    p_body: message.slice(0, 4000),
+    p_link: null,
+  });
+
   revalidatePath("/admin");
   return { ok: true };
 }
