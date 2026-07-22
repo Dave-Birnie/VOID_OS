@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { User, Code, LogIn, LogOut, Shield, Sparkles, MessageSquare, Video } from "lucide-react";
+import { User, Code, LogIn, LogOut, Shield, Sparkles, MessageSquare, Video, FileText } from "lucide-react";
 import { UserProfile } from "@/lib/supabase/client";
 
 interface HeaderProps {
@@ -48,6 +48,10 @@ export const Header: React.FC<HeaderProps> = ({
         <nav className="hidden md:flex items-center gap-6 text-xs font-mono text-zinc-300">
           <Link href="/" className="hover:text-void-purple transition-colors">
             Overview
+          </Link>
+          <Link href="/blog" className="flex items-center gap-1.5 hover:text-void-purple transition-colors">
+            <FileText className="w-3.5 h-3.5 text-void-purple" aria-hidden="true" />
+            Blog
           </Link>
           <Link href="/dev-journey" className="flex items-center gap-1.5 hover:text-void-cyan transition-colors">
             <Video className="w-3.5 h-3.5 text-void-purple" />
