@@ -73,44 +73,63 @@ export default function HomePage() {
     accentText: isDev ? "text-void-blue" : "text-void-purple",
   };
 
-  // Developer self-host passes (one-time). Where a Kickstarter deal price
-  // differs from the regular post-campaign price, both are shown.
+  // Kickstarter backer tiers (one-time). Mirrors the 6-tier structure in
+  // VOID_OS_Master_Plan.md. Every tier includes the PDF workflow guide +
+  // discount/affiliate links.
   const devPacks = [
     {
-      tag: "Modular Self-Host",
-      name: "Modular Pass",
-      ks: 100,
-      regular: 100,
-      blurb: "One standalone app paired with Daily Ops. Full source + BYOK AI integration included.",
-      features: ["1 Modular App + Daily Ops", "Complete source code", "BYOK AI (Claude / OpenAI / Gemini / Grok)"],
+      tag: "Supporter",
+      name: "Digital Supporter",
+      price: "$10",
+      blurb: "Back the build and get the founder's tech-stack playbook.",
+      features: ["PDF Workflow Guide", "Discount & partner links", "Wall of Fame credit"],
       highlight: false,
+      vip: false,
     },
     {
-      tag: "Founder Early Bird",
-      name: "Founder Pass",
-      ks: 150,
-      regular: 250,
-      blurb: "Everything in Modular plus 3 more apps (4 total) and a 3-month premium VOID Online pass with server-side AI credits.",
-      features: ["4 Apps total + Daily Ops", "3-month premium VOID Online pass", "Server-side AI credits included"],
+      tag: "Backer",
+      name: "Watch-the-Dev",
+      price: "$25",
+      blurb: "Everything in Supporter, plus the private dev portal and raw video logs.",
+      features: ["Private Dev Portal", "Raw weekly video logs", "Everything in $10 tier"],
       highlight: false,
+      vip: false,
     },
     {
-      tag: "Pro Self-Host",
-      name: "Extended Bundle",
-      ks: 750,
-      regular: 750,
-      blurb: "All 10 core apps with complete video guides and tutorials. BYOK AI.",
-      features: ["All 10 Core Apps", "Video guides & tutorials", "BYOK AI integration"],
+      tag: "Early Bird",
+      name: "Early Bird Pass",
+      price: "$150",
+      blurb: "The VOID OS core plus Daily Ops and one app's full source code.",
+      features: ["VOID OS Core + Daily Ops", "1 App source code", "Everything in $25 tier"],
       highlight: false,
+      vip: false,
     },
     {
-      tag: "Ultimate Suite",
-      name: "15-App + AI Bundle",
-      ks: 1199,
-      regular: 1450,
-      blurb: "The top tier: all 15 apps plus complete end-to-end AI integration wiring.",
-      features: ["All 15 Apps", "End-to-end AI integration", "Priority build support"],
+      tag: "Builder",
+      name: "Core Builder Pass",
+      price: "$350–450",
+      blurb: "The core plus five apps of full source code.",
+      features: ["VOID OS Core", "5 Apps source code", "Everything in $25 tier"],
       highlight: true,
+      vip: false,
+    },
+    {
+      tag: "Bundle",
+      name: "Extended Bundle",
+      price: "$999",
+      blurb: "All 10 apps plus the BYOK AI integration code.",
+      features: ["All 10 Apps", "BYOK AI integration code", "Everything in $25 tier"],
+      highlight: false,
+      vip: false,
+    },
+    {
+      tag: "Lifetime",
+      name: "Lifetime VIP",
+      price: "$2,500",
+      blurb: "15 apps, multi-tenant CMS, and full resell rights. Campaign only, 5 seats.",
+      features: ["15 Apps + Multi-Tenant CMS", "Resell / white-label rights", "5 seats · campaign only"],
+      highlight: false,
+      vip: true,
     },
   ];
 
@@ -385,7 +404,7 @@ export default function HomePage() {
                         Add AI Upgrade <span className="text-void-cyan">+$10.00 / mo</span>
                       </h4>
                       <p className="text-[10px] text-zinc-400">
-                        Uses server-side Google Gemini credits with dual bank tracking (Monthly Allowance + Top-Up Credits).
+                        Uses server-side AI credits with dual bank tracking (Monthly Allowance + Top-Up Credits).
                       </p>
                     </div>
                   </div>
@@ -533,12 +552,14 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
                 {devPacks.map((pack) => (
                   <div
                     key={pack.name}
                     className={`rounded-2xl p-6 flex flex-col justify-between relative transition-all ${
-                      pack.highlight
+                      pack.vip
+                        ? "bg-gradient-to-br from-amber-950/30 via-void-card/80 to-black border border-amber-500/50 shadow-xl"
+                        : pack.highlight
                         ? "bg-void-card/80 border border-blue-500/50 shadow-xl glow-blue"
                         : "bg-void-card/60 border border-zinc-800 hover:border-blue-500/40"
                     }`}
@@ -548,27 +569,23 @@ export default function HomePage() {
                         BEST VALUE
                       </span>
                     )}
+                    {pack.vip && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-500 text-black text-[9px] font-black uppercase tracking-wider whitespace-nowrap">
+                        Campaign Only
+                      </span>
+                    )}
                     <div>
-                      <span className="text-[10px] text-blue-400 uppercase font-bold">{pack.tag}</span>
-                      <h3 className="text-xl font-bold text-white mt-1">{pack.name}</h3>
+                      <span className={`text-[10px] uppercase font-bold ${pack.vip ? "text-amber-400" : "text-blue-400"}`}>
+                        {pack.tag}
+                      </span>
+                      <h3 className="text-xl font-bold text-white mt-1 flex items-center gap-1.5">
+                        {pack.vip && <Crown className="w-4 h-4 text-amber-400" />}
+                        {pack.name}
+                      </h3>
 
                       <div className="mt-4 flex items-baseline gap-2">
-                        <span className="text-3xl font-black text-white">${pack.ks.toLocaleString()}</span>
-                        {pack.regular > pack.ks && (
-                          <span className="text-xs text-zinc-500 line-through">${pack.regular.toLocaleString()}</span>
-                        )}
-                      </div>
-                      <div className="mt-1 flex items-center gap-2">
-                        {pack.regular > pack.ks ? (
-                          <>
-                            <span className="inline-block px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[9px] font-bold uppercase tracking-wide">
-                              Kickstarter Deal
-                            </span>
-                            <span className="text-[9px] text-zinc-500">${pack.regular.toLocaleString()} after campaign</span>
-                          </>
-                        ) : (
-                          <span className="text-[9px] text-zinc-500">One-time · same price after campaign</span>
-                        )}
+                        <span className="text-3xl font-black text-white">{pack.price}</span>
+                        <span className="text-[10px] text-zinc-500">one-time</span>
                       </div>
 
                       <p className="mt-4 text-xs text-zinc-400 leading-relaxed">{pack.blurb}</p>
@@ -576,7 +593,12 @@ export default function HomePage() {
                       <ul className="mt-6 space-y-3 text-xs text-zinc-300">
                         {pack.features.map((f) => (
                           <li key={f} className="flex items-center gap-2">
-                            <Boxes className="w-4 h-4 text-void-blue flex-shrink-0" /> {f}
+                            {pack.vip ? (
+                              <ShieldCheck className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                            ) : (
+                              <Boxes className="w-4 h-4 text-void-blue flex-shrink-0" />
+                            )}
+                            {f}
                           </li>
                         ))}
                       </ul>
@@ -584,50 +606,21 @@ export default function HomePage() {
                     <button
                       onClick={goToLogin}
                       className={`mt-8 w-full py-3 rounded-xl font-bold text-xs min-h-[44px] transition-all ${
-                        pack.highlight
+                        pack.vip
+                          ? "bg-amber-500 hover:bg-amber-400 text-black"
+                          : pack.highlight
                           ? "bg-gradient-to-r from-void-blue to-void-cyan text-white glow-blue"
                           : "border border-zinc-800 hover:border-blue-500/40 text-zinc-300 hover:text-white bg-black/40"
                       }`}
                     >
-                      Get {pack.name}
+                      {pack.vip ? "Claim a VIP Seat" : `Back — ${pack.price}`}
                     </button>
                   </div>
                 ))}
               </div>
-
-              {/* Lifetime VIP White-Label — Kickstarter campaign only */}
-              <div className="relative rounded-3xl p-6 md:p-8 bg-gradient-to-br from-amber-950/30 via-[#100f1a] to-black border border-amber-500/40 shadow-2xl overflow-hidden">
-                <div className="absolute top-0 right-0 px-4 py-1.5 rounded-bl-2xl bg-amber-500 text-black text-[10px] font-black uppercase tracking-widest">
-                  Kickstarter Campaign Only
-                </div>
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                  <div className="lg:max-w-xl">
-                    <span className="text-[10px] text-amber-400 uppercase font-bold tracking-widest flex items-center gap-1.5">
-                      <Crown className="w-3.5 h-3.5" /> Lifetime VIP White-Label
-                    </span>
-                    <h3 className="text-2xl font-black text-white mt-1">Own & Rebrand the Entire Ecosystem</h3>
-                    <p className="text-zinc-400 text-xs md:text-sm mt-2 leading-relaxed">
-                      Full white-label rights to all 15 apps for life. Rebrand, resell, and run your own instance.
-                      Available <strong className="text-amber-300">only during the Kickstarter campaign</strong> — this tier retires when the campaign ends.
-                    </p>
-                    <ul className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-zinc-300">
-                      <li className="flex items-center gap-2"><Crown className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" /> 15 apps, lifetime</li>
-                      <li className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" /> Full white-label rights</li>
-                      <li className="flex items-center gap-2"><Zap className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" /> Only 5 seats available</li>
-                    </ul>
-                  </div>
-                  <div className="text-center lg:text-right flex-shrink-0">
-                    <div className="text-4xl font-black text-white">$2,500</div>
-                    <div className="text-[10px] text-amber-300/80 uppercase tracking-wide mb-3">5 seats · campaign only</div>
-                    <button
-                      onClick={goToLogin}
-                      className="w-full lg:w-auto px-8 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs min-h-[44px] transition-all"
-                    >
-                      Claim a VIP Seat
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <p className="text-center text-[11px] text-zinc-500 font-mono">
+                Every tier includes the PDF workflow guide + partner discount links.
+              </p>
             </div>
           )}
         </section>
