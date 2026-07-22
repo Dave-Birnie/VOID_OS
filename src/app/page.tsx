@@ -8,7 +8,7 @@ import { AuthModal } from "@/components/AuthModal";
 import { VisitorAiChatbot } from "@/components/VisitorAiChatbot";
 import { Simulator } from "@/components/Simulator";
 import { AiCreditWidget } from "@/components/AiCreditWidget";
-import { getLocalAuthState, setLocalAuthState, UserProfile } from "@/lib/supabase/client";
+import { getLocalAuthState, setLocalAuthState, UserProfile, isAdminEmail } from "@/lib/supabase/client";
 import {
   Gamepad2,
   CheckCircle2,
@@ -38,7 +38,17 @@ export default function HomePage() {
 
   useEffect(() => {
     const existingUser = getLocalAuthState();
-    if (existingUser) setUser(existingUser);
+    if (existingUser) {
+      // Auto-upgrade an allowlisted email to admin (e.g. accounts created
+      // before admin recognition existed).
+      if (isAdminEmail(existingUser.email) && existingUser.role !== "admin") {
+        const upgraded: UserProfile = { ...existingUser, role: "admin" };
+        setLocalAuthState(upgraded);
+        setUser(upgraded);
+      } else {
+        setUser(existingUser);
+      }
+    }
   }, []);
 
   const handleLogout = () => {

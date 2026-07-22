@@ -5,6 +5,17 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "mock-key";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Accounts that should be granted admin access on login. Matched
+// case-insensitively. Add more emails here as needed.
+export const ADMIN_EMAILS = ["david.cp.birnie@gmail.com"];
+
+export const isAdminEmail = (email: string | null | undefined): boolean => {
+  if (!email) return false;
+  const e = email.trim().toLowerCase();
+  // Explicit allowlist, or any address containing "admin" (demo convenience).
+  return ADMIN_EMAILS.includes(e) || e.includes("admin");
+};
+
 export interface UserProfile {
   id: string;
   email: string;

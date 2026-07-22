@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { X, Mail, Lock, User, ArrowRight, ShieldCheck } from "lucide-react";
-import { UserProfile, setLocalAuthState } from "@/lib/supabase/client";
+import { UserProfile, setLocalAuthState, isAdminEmail } from "@/lib/supabase/client";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -28,7 +28,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         id: "usr_" + Math.random().toString(36).substr(2, 9),
         email: email || "demo@voidos.io",
         full_name: name || (email ? email.split("@")[0] : "Demo Member"),
-        role: email.includes("admin") ? "admin" : "user",
+        role: isAdminEmail(email) ? "admin" : "user",
         has_dev_pass: true,
         ai_subscription_active: true,
         monthly_token_limit: 500000,

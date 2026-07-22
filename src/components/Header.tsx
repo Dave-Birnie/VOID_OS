@@ -108,6 +108,17 @@ export const Header: React.FC<HeaderProps> = ({
                   {user.role === "admin" ? "⚡ Admin Account" : user.has_dev_pass ? "⭐ Dev Pass Active" : "Free User"}
                 </span>
               </div>
+              {user.role === "admin" && (
+                <Link
+                  href="/admin"
+                  title="Admin dashboard"
+                  aria-label="Admin dashboard"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-500/40 text-amber-300 hover:text-amber-200 hover:border-amber-500 transition-all bg-amber-950/20 text-xs font-bold"
+                >
+                  <Shield className="w-4 h-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Admin</span>
+                </Link>
+              )}
               <button
                 onClick={onLogout}
                 title="Sign Out"
