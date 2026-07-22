@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { X, Mail, Lock, User, ArrowRight, ShieldCheck } from "lucide-react";
 import { UserProfile, setLocalAuthState, isAdminEmail } from "@/lib/supabase/client";
 
@@ -11,6 +12,7 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
+  const router = useRouter();
   const [tab, setTab] = useState<"register" | "login">("register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,6 +42,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
       setIsLoading(false);
       onSuccess(mockProfile);
       onClose();
+      // Admins go straight to their dashboard after signing in.
+      if (mockProfile.role === "admin") {
+        router.push("/admin");
+      }
     }, 600);
   };
 
