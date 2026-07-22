@@ -1,5 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+export type AppSettings = {
+  app_names?: Record<string, string>;
+  widget_order?: string[];
+  hidden_widgets?: string[];
+  life_stats?: Record<string, number>;
+  [key: string]: unknown;
+};
+
 // Which apps the user has installed (active).
 export async function getActiveAppIds(
   supabase: SupabaseClient,
@@ -13,17 +21,15 @@ export async function getActiveAppIds(
   return new Set((data ?? []).map((r) => r.app_id as string));
 }
 
-// Which dashboard widgets the user has on their board (order preserved).
-export async function getActiveWidgetIds(
+// The user's whole app_settings blob (widget layout, custom names, etc.).
+export async function getAppSettings(
   supabase: SupabaseClient,
   userId: string
-): Promise<string[]> {
+): Promise<AppSettings> {
   const { data } = await supabase
     .from("profiles")
     .select("app_settings")
     .eq("id", userId)
     .single();
-  const settings = data?.app_settings as Record<string, unknown> | null;
-  const widgets = settings?.widgets;
-  return Array.isArray(widgets) ? (widgets as string[]) : [];
+  return ((data?.app_settings as AppSettings) ?? {}) as AppSettings;
 }
