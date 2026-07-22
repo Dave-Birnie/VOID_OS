@@ -14,10 +14,6 @@ export interface BlogPost {
   updated_at: string;
 }
 
-// Token-gated edge function used by the CMS for all writes.
-export const BLOG_ADMIN_FN =
-  `${process.env.NEXT_PUBLIC_SUPABASE_URL || ""}/functions/v1/blog-admin`;
-
 // All fetches are wrapped so a Supabase outage (or a build environment without
 // Supabase env vars configured) degrades to an empty blog rather than crashing.
 export async function getPublishedPosts(): Promise<BlogPost[]> {
