@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Code, LogIn, LogOut, Shield, MessageSquare, Video, FileText } from "lucide-react";
+import { User, Code, LogIn, LogOut, Shield, MessageSquare, Video, FileText, LayoutDashboard } from "lucide-react";
 import { UserProfile, createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
@@ -122,15 +122,24 @@ export const Header: React.FC<HeaderProps> = ({ mode, onModeChange, onHome, user
                   {user.role === "admin" ? "⚡ Admin Account" : user.has_dev_pass ? "⭐ Dev Pass Active" : "Free User"}
                 </span>
               </div>
+              <Link
+                href="/dashboard"
+                title="Dashboard"
+                aria-label="Dashboard"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-void-purple/40 text-void-purple hover:text-white hover:border-void-purple transition-all bg-purple-950/20 text-xs font-bold"
+              >
+                <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </Link>
               {user.role === "admin" && (
                 <Link
                   href="/admin"
-                  title="Admin dashboard"
-                  aria-label="Admin dashboard"
+                  title="Admin CMS"
+                  aria-label="Admin CMS"
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-500/40 text-amber-300 hover:text-amber-200 hover:border-amber-500 transition-all bg-amber-950/20 text-xs font-bold"
                 >
                   <Shield className="w-4 h-4" aria-hidden="true" />
-                  <span className="hidden sm:inline">Admin</span>
+                  <span className="hidden sm:inline">CMS</span>
                 </Link>
               )}
               <button

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
+import { ModeSwitch } from "@/components/ModeSwitch";
 import { AdminAiCopilot } from "@/components/AdminAiCopilot";
 import type { UserProfile, ChatTranscript, Shoutout } from "@/lib/supabase/client";
 import { sendShoutout, publishDevlog } from "@/app/admin/actions";
@@ -100,9 +101,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, transcript
       <Header mode="developer" onModeChange={() => {}} user={user} />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 py-10 w-full">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-white mb-6">
-          <ArrowLeft className="w-4 h-4" /> Back to Overview
-        </Link>
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-white">
+            <ArrowLeft className="w-4 h-4" /> Back to Overview
+          </Link>
+          <ModeSwitch />
+        </div>
 
         {/* Backend section entry points */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
