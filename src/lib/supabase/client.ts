@@ -1,19 +1,30 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+import { supabaseUrl, supabaseAnonKey } from "./config";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://mock.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "mock-key";
+// Anonymous client for public reads that run on both the server and the
+// client (e.g. the blog and sitemap). Falls back to a harmless placeholder so
+// builds without env vars don't crash — callers already treat failures as
+// "no data".
+export const supabase = createSupabaseJsClient(
+  supabaseUrl || "https://placeholder.supabase.co",
+  supabaseAnonKey || "placeholder-anon-key"
+);
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Browser client used inside Client Components for the real auth session
+// (sign in / sign up / sign out and reading the logged-in user). Cookie-based
+// so it stays in sync with the server session refreshed by the middleware.
+export function createBrowserSupabase() {
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+}
 
-// Accounts that should be granted admin access on login. Matched
-// case-insensitively. Add more emails here as needed.
+// Accounts seeded as admin. The database `role` column is the source of truth;
+// this allowlist is only used to bootstrap the first admin at sign-up.
 export const ADMIN_EMAILS = ["david.cp.birnie@gmail.com"];
 
 export const isAdminEmail = (email: string | null | undefined): boolean => {
   if (!email) return false;
-  const e = email.trim().toLowerCase();
-  // Explicit allowlist, or any address containing "admin" (demo convenience).
-  return ADMIN_EMAILS.includes(e) || e.includes("admin");
+  return ADMIN_EMAILS.includes(email.trim().toLowerCase());
 };
 
 export interface UserProfile {
@@ -63,26 +74,3 @@ export interface Shoutout {
   target_group: string;
   created_at: string;
 }
-
-// Local Demo State Helper for immediate browser responsiveness
-export const getLocalAuthState = (): UserProfile | null => {
-  if (typeof window === "undefined") return null;
-  const stored = localStorage.getItem("void_os_user_profile");
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch {
-      return null;
-    }
-  }
-  return null;
-};
-
-export const setLocalAuthState = (profile: UserProfile | null) => {
-  if (typeof window === "undefined") return;
-  if (profile) {
-    localStorage.setItem("void_os_user_profile", JSON.stringify(profile));
-  } else {
-    localStorage.removeItem("void_os_user_profile");
-  }
-};
