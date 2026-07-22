@@ -363,7 +363,7 @@ export default function HomePage() {
                         Add AI Upgrade <span className="text-void-cyan">+$10.00 / mo</span>
                       </h4>
                       <p className="text-[10px] text-zinc-400">
-                        Uses server-side OpenAI credits with dual bank tracking (Monthly Allowance + Top-Up Credits).
+                        Uses server-side Google Gemini credits with dual bank tracking (Monthly Allowance + Top-Up Credits).
                       </p>
                     </div>
                   </div>

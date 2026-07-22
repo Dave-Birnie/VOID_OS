@@ -42,7 +42,7 @@ export const AiCreditWidget: React.FC<AiCreditWidgetProps> = ({ user, onUpdatePr
           </div>
           <div>
             <h4 className="font-bold text-xs text-white">AI Credit Banks ($10/mo Upgrade)</h4>
-            <span className="text-[9px] text-zinc-400">Server-Side OpenAI Token Allocation</span>
+            <span className="text-[9px] text-zinc-400">Server-Side Gemini Token Allocation</span>
           </div>
         </div>
         <button
