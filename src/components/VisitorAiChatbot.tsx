@@ -77,7 +77,7 @@ export const VisitorAiChatbot: React.FC = () => {
           "VOID OS offers two paths! 1) VOID Online (our hosted version) starting at $10/mo ($15/mo Pro, $25/mo All-Access) with an optional $10/mo AI Upgrade. 2) Developer Passes ranging from the $15 Watch-the-Dev Pass up to the $750 Extended Bundle & $2,500 Lifetime VIP!";
       } else if (lower.includes("ai") || lower.includes("token") || lower.includes("byok")) {
         gideonReply =
-          "Self-hosted Developer tiers use Bring-Your-Own-Key (BYOK) for Claude, OpenAI, Gemini, or Grok. The $10/mo VOID Online AI Upgrade uses server-side Google Gemini credits with two credit banks: Monthly Allowance (resets monthly) and non-expiring Top-Up Credits!";
+          "Every app is AI-integrated via Bring-Your-Own-Key (BYOK) — plug in your own key for Claude, OpenAI, Gemini, or Grok. The optional $10/mo VOID Online AI Upgrade uses server-side credits with two credit banks: Monthly Allowance (resets monthly) and non-expiring Top-Up Credits!";
       } else if (lower.includes("watch") || lower.includes("dev") || lower.includes("journey")) {
         gideonReply =
           "The $15 Kickstarter ($25 regular) Watch-the-Dev Pass unlocks unfiltered weekly YouTube unlisted devlog videos, written engineering deep dives, beta app testing, and community chat access directly with Dave!";
