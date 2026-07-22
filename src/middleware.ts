@@ -17,6 +17,7 @@ export async function middleware(request: NextRequest) {
   // Dev Journey portal are member-only; /admin additionally requires admin role.
   const requiresAuth =
     pathname.startsWith("/admin") ||
+    pathname.startsWith("/dashboard") ||
     pathname.startsWith("/community-chat") ||
     pathname.startsWith("/dev-journey");
 
@@ -60,7 +61,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname === "/login" && user) {
-    return NextResponse.redirect(new URL("/admin", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return response;
