@@ -42,7 +42,7 @@ export const AdminAiCopilot: React.FC = () => {
       } else if (lower.includes("draft") || lower.includes("blog") || lower.includes("devlog")) {
         response = `📝 **Drafted Devlog Entry**: \n\n# Devlog #14: Architecture of VOID OS & Supabase RLS\n\nIn this episode, Dave breaks down how we structured data sovereignty and Row Level Security for habit tracking. Plus, an inside look at the dual credit-bank AI token tracker!\n\n🎥 **YouTube Unlisted Video Link:** https://youtu.be/unlisted_demo_devlog`;
       } else if (lower.includes("analytic") || lower.includes("revenue") || lower.includes("user")) {
-        response = `📈 **Gideon Executive Summary**:\n\n• **Total Registered Users:** 48 users\n• **Active Dev Passes ($15/$25):** 14 backers\n• **Active SaaS AI Subscriptions ($10/mo):** 8 subscribers\n• **Total Token Usage:** 1,240,000 / 4,000,000 tokens (Healthy 31% utilization)`;
+        response = `📈 **Gideon Executive Summary**:\n\n• **Total Registered Users:** 48 users\n• **Active Dev Passes ($15/$25):** 14 backers\n• **Active VOID Online AI Subscriptions ($10/mo):** 8 subscribers\n• **Total Token Usage:** 1,240,000 / 4,000,000 tokens (Healthy 31% utilization)`;
       } else {
         response = `I have logged your request in the VOID OS executive pipeline. Would you like me to run a full transcript summarization or generate draft copy for the Kickstarter update?`;
       }

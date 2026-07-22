@@ -22,7 +22,7 @@ export default function DevJourneyPage() {
 
 ### Key Topics Covered Today:
 1. **Data Sovereignty:** Structuring Supabase PostgreSQL schemas with Row Level Security (RLS) so users own their habit data.
-2. **Dual Credit-Bank AI Tracking:** Implementing Bank 1 (Monthly Token Allowance) and Bank 2 (Non-expiring Top-Up Credits) for the $10/mo SaaS AI Upgrade.
+2. **Dual Credit-Bank AI Tracking:** Implementing Bank 1 (Monthly Token Allowance) and Bank 2 (Non-expiring Top-Up Credits) for the $10/mo VOID Online AI Upgrade.
 3. **Gideon Public & Admin AI Assistant:** Wiring transcript logging for visitor objection analytics.`,
       youtube_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
       is_locked: true,

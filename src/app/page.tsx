@@ -8,6 +8,7 @@ import { AuthModal } from "@/components/AuthModal";
 import { VisitorAiChatbot } from "@/components/VisitorAiChatbot";
 import { Simulator } from "@/components/Simulator";
 import { AiCreditWidget } from "@/components/AiCreditWidget";
+import { Waitlist } from "@/components/Waitlist";
 import { getLocalAuthState, setLocalAuthState, UserProfile, isAdminEmail } from "@/lib/supabase/client";
 import {
   Gamepad2,
@@ -88,8 +89,8 @@ export default function HomePage() {
       name: "Founder Pass",
       ks: 150,
       regular: 250,
-      blurb: "Everything in Modular plus 3 more apps (4 total) and a 3-month premium cloud SaaS pass with server-side AI credits.",
-      features: ["4 Apps total + Daily Ops", "3-month premium SaaS cloud pass", "Server-side AI credits included"],
+      blurb: "Everything in Modular plus 3 more apps (4 total) and a 3-month premium VOID Online pass with server-side AI credits.",
+      features: ["4 Apps total + Daily Ops", "3-month premium VOID Online pass", "Server-side AI credits included"],
       highlight: false,
     },
     {
@@ -152,7 +153,7 @@ export default function HomePage() {
             <span>
               {isDev
                 ? "DEVELOPER MODE: SOURCE CODE & SELF-HOSTING PASSES"
-                : "CONSUMER MODE: TURNKEY GAMIFIED LIFE OS & SAAS"}
+                : "VOID ONLINE: THE READY-TO-USE GAMIFIED LIFE OS"}
             </span>
           </div>
 
@@ -177,7 +178,7 @@ export default function HomePage() {
           <p className="mt-6 text-zinc-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
             {isDev
               ? "Complete source code, Supabase database schemas, self-hosting scripts, and unfiltered weekly developer video logs — with full data sovereignty and BYOK AI."
-              : "Ditch expensive subscription habit-trackers. Turnkey cloud Life OS apps with complete data sovereignty and gamified progress loops — zero setup required."}
+              : "Meet VOID Online — the fully-hosted, ready-to-use version. Ditch expensive subscription habit-trackers and get gamified progress with complete data sovereignty. Zero setup, sign in and go."}
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto sm:max-w-none">
@@ -191,7 +192,7 @@ export default function HomePage() {
               href="#pricing-section"
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-mono font-bold text-xs border border-zinc-800 hover:border-purple-500/40 text-zinc-300 hover:text-white transition-all bg-black/40 flex items-center justify-center gap-2 min-h-[44px]"
             >
-              {isDev ? "View Developer Passes ($100+)" : "View SaaS Pricing ($10/mo)"}
+              {isDev ? "View Developer Passes ($100+)" : "View VOID Online Pricing ($10/mo)"}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -204,6 +205,9 @@ export default function HomePage() {
           </section>
         )}
 
+        {/* VOID ONLINE WAITLIST (CONSUMER MODE) */}
+        {!isDev && <Waitlist />}
+
         {/* CONSUMER-EXCLUSIVE VALUE GRID */}
         {!isDev && (
           <section className="max-w-7xl mx-auto px-4 md:px-6 py-6">
@@ -211,9 +215,9 @@ export default function HomePage() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-4 mb-4">
                 <div>
                   <span className="text-[10px] text-void-purple font-bold uppercase tracking-widest">
-                    ZERO-CONFIG CLOUD SAAS
+                    VOID ONLINE · HOSTED FOR YOU
                   </span>
-                  <h3 className="text-xl font-bold text-white">Turnkey. Gamified. Yours.</h3>
+                  <h3 className="text-xl font-bold text-white">Ready-to-use. Gamified. Yours.</h3>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-1 rounded-md bg-purple-950 text-purple-300 text-xs border border-purple-800">
@@ -365,9 +369,9 @@ export default function HomePage() {
             /* CONSUMER MODE: SaaS PRICING TIERS */
             <div>
               <div className="text-center max-w-2xl mx-auto mb-8">
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white">Turnkey Cloud SaaS Plans</h2>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white">VOID Online Plans</h2>
                 <p className="text-zinc-400 mt-2 text-xs md:text-sm">
-                  Hosted directly on cloud web apps with zero configuration required.
+                  Fully hosted and ready to use — sign in and start, zero configuration required.
                 </p>
 
                 {/* +$10/mo AI Upgrade Toggle Card */}
@@ -398,7 +402,7 @@ export default function HomePage() {
                 {/* Starter SaaS */}
                 <div className="bg-void-card/60 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between hover:border-purple-500/40 transition-all">
                   <div>
-                    <span className="text-[10px] text-zinc-500 uppercase font-bold">Starter SaaS</span>
+                    <span className="text-[10px] text-zinc-500 uppercase font-bold">VOID Online · Starter</span>
                     <h3 className="text-xl font-bold text-white mt-1">Starter Account</h3>
                     <div className="mt-4 flex items-baseline gap-1">
                       <span className="text-3xl font-black text-white">
@@ -440,7 +444,7 @@ export default function HomePage() {
                     MOST POPULAR
                   </span>
                   <div>
-                    <span className="text-[10px] text-purple-400 uppercase font-bold">Standard SaaS</span>
+                    <span className="text-[10px] text-purple-400 uppercase font-bold">VOID Online · Standard</span>
                     <h3 className="text-xl font-bold text-white mt-1">Pro Standard</h3>
                     <div className="mt-4 flex items-baseline gap-1">
                       <span className="text-3xl font-black text-white">
@@ -479,7 +483,7 @@ export default function HomePage() {
                 {/* All Access */}
                 <div className="bg-void-card/60 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-500/40 transition-all">
                   <div>
-                    <span className="text-[10px] text-zinc-500 uppercase font-bold">All-Access SaaS</span>
+                    <span className="text-[10px] text-zinc-500 uppercase font-bold">VOID Online · All-Access</span>
                     <h3 className="text-xl font-bold text-white mt-1">All-Access VIP</h3>
                     <div className="mt-4 flex items-baseline gap-1">
                       <span className="text-3xl font-black text-white">

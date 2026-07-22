@@ -249,7 +249,7 @@ export default function AdminDashboardPage() {
 
               <div className="bg-[#100f1a] border border-zinc-800 p-5 rounded-2xl">
                 <div className="flex items-center justify-between text-zinc-400 text-xs mb-2">
-                  <span>SaaS AI Subscriptions</span>
+                  <span>VOID Online AI Subscriptions</span>
                   <Cpu className="w-4 h-4 text-void-pink" />
                 </div>
                 <div className="text-3xl font-black text-white">8</div>

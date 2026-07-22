@@ -32,10 +32,10 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({ onSelect }) => {
           <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center mb-5">
             <User className="w-6 h-6 text-void-purple" />
           </div>
-          <span className="text-[10px] font-mono uppercase tracking-widest text-purple-300 font-bold">Consumer Mode</span>
-          <h2 className="text-xl font-black text-white font-mono mt-1">Turnkey Cloud SaaS</h2>
+          <span className="text-[10px] font-mono uppercase tracking-widest text-purple-300 font-bold">VOID Online</span>
+          <h2 className="text-xl font-black text-white font-mono mt-1">Ready-to-Use, Hosted</h2>
           <p className="text-zinc-400 text-xs mt-3 leading-relaxed">
-            Ready-to-use gamified Life OS apps hosted for you. Zero setup, monthly plans, optional AI upgrade.
+            The fully-hosted VOID Online: gamified Life OS apps ready to go. Zero setup, monthly plans, optional AI upgrade.
           </p>
           <ul className="mt-4 space-y-2 text-[11px] font-mono text-zinc-300">
             <li className="flex items-center gap-2"><Gamepad2 className="w-3.5 h-3.5 text-void-purple" /> Gamified XP & Battle Board</li>

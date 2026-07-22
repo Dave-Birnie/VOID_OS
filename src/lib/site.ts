@@ -7,7 +7,7 @@ export const siteConfig = {
   shortName: "VOID OS",
   tagline: "The Gamified Life OS You Deploy & Own",
   description:
-    "VOID OS is a gamified Life OS and habit-tracking platform with complete data sovereignty. Choose turnkey cloud SaaS (from $10/mo) or self-host the full source code with Supabase, Next.js, and bring-your-own-key AI.",
+    "VOID OS is a gamified Life OS and habit-tracking platform with complete data sovereignty. Choose VOID Online — our fully-hosted, ready-to-use plans (from $10/mo) — or self-host the full source code with Supabase, Next.js, and bring-your-own-key AI.",
   url: (process.env.NEXT_PUBLIC_SITE_URL || "https://silver-crane-475254.hostingersite.com").replace(/\/$/, ""),
   ogImage: "/og-image.png",
   locale: "en_CA",

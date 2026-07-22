@@ -92,14 +92,14 @@ const jsonLd = {
       offers: [
         {
           "@type": "Offer",
-          name: "Starter SaaS",
+          name: "VOID Online Starter",
           price: "10.00",
           priceCurrency: "USD",
-          description: "Turnkey cloud Life OS — any 3 modular apps, monthly.",
+          description: "VOID Online, fully hosted — any 3 modular apps, monthly.",
         },
         {
           "@type": "Offer",
-          name: "Pro Standard SaaS",
+          name: "VOID Online Pro",
           price: "15.00",
           priceCurrency: "USD",
           description: "10 modular apps with priority cloud sync, monthly.",
@@ -121,7 +121,7 @@ const jsonLd = {
           name: "What is VOID OS?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "VOID OS is a gamified Life OS and habit-tracking platform. Use it as a turnkey cloud SaaS from $10/month, or self-host the full source code with complete data sovereignty.",
+            text: "VOID OS is a gamified Life OS and habit-tracking platform. Use VOID Online — our fully-hosted plans from $10/month — or self-host the full source code with complete data sovereignty.",
           },
         },
         {
@@ -137,7 +137,7 @@ const jsonLd = {
           name: "Does VOID OS include AI?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "The cloud SaaS AI Upgrade (+$10/month) uses server-side credits with dual credit banks. Self-hosted developer tiers are AI-integrated via bring-your-own-key — every app has AI built into its workflow and you supply your own API key.",
+            text: "The VOID Online AI Upgrade (+$10/month) uses server-side credits with dual credit banks. Self-hosted developer tiers are AI-integrated via bring-your-own-key — every app has AI built into its workflow and you supply your own API key.",
           },
         },
       ],

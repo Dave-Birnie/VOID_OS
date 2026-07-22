@@ -29,6 +29,10 @@ Legend: `[ ]` todo · `[x]` done · 🔴 blocking/important · 🟡 phase 2 · �
 - [x] **Blog CMS**: `/admin/blog` — create/edit/publish/delete, token-gated Supabase edge function (secure writes)
 - [x] Supabase schema applied to `davidbirnie-site` project (VOID OS tables + `blog_posts`)
 - [x] Admin access: allowlist your Gmail, auto-upgrade session, always-visible Admin button
+- [x] Admins redirect to `/admin` dashboard after login
+- [x] Renamed consumer product from "turnkey SaaS" jargon to **VOID Online** everywhere
+- [x] **VOID Online waitlist** with live count-up ticker toward a 50-member goal
+      (Supabase `void_waitlist` table + public count function)
 
 ---
 
@@ -53,6 +57,8 @@ The dashboard exists but most of it is demo data. Real versions need Supabase Au
 + a server runtime (per the master plan, this is the **Vercel** move).
 
 - [ ] **Real Supabase Auth** (email/password + OAuth), replacing the mock localStorage login
+- [ ] **User portal / app after login** (`/app` or `/dashboard`) — real Daily Ops + Battle
+      Board saved per user, so a normal login lands somewhere real instead of the landing page
 - [ ] Enforce admin via `profiles.role` + RLS (not a client-side allowlist)
 - [ ] Wire **Analytics** tab to real data (currently static sample numbers)
 - [ ] Wire **Chat transcripts** to Supabase (currently local-browser only)
@@ -106,6 +112,7 @@ The dashboard exists but most of it is demo data. Real versions need Supabase Au
 - **Admin email allowlist:** `src/lib/supabase/client.ts` → `ADMIN_EMAILS`
 - **Site/SEO config:** `src/lib/site.ts`
 - **Working branch:** `claude/sites-broken-thkdw6` → merged to `main` to deploy
+- **Waitlist:** `void_waitlist` table + `void_waitlist_count()` fn; goal = 50 (in `src/components/Waitlist.tsx`)
 
 ---
 
