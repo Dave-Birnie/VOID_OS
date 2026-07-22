@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
-import { AuthModal } from "@/components/AuthModal";
 import { VisitorAiChatbot } from "@/components/VisitorAiChatbot";
-import { getLocalAuthState, setLocalAuthState, UserProfile, DevlogEntry } from "@/lib/supabase/client";
-import { Video, Lock, Unlock, Play, FileText, ArrowLeft, ShieldAlert, Sparkles } from "lucide-react";
+import { DevlogEntry } from "@/lib/supabase/client";
+import { useSessionProfile } from "@/lib/useSessionProfile";
+import { Video, Lock, Unlock, ArrowLeft } from "lucide-react";
 
 export default function DevJourneyPage() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const router = useRouter();
+  const { profile: user } = useSessionProfile();
+  const isUnlocked = !!(user && (user.has_dev_pass || user.role === "admin"));
 
   const devlogs: DevlogEntry[] = [
     {
@@ -39,40 +40,16 @@ export default function DevJourneyPage() {
     },
   ];
 
-  useEffect(() => {
-    const existing = getLocalAuthState();
-    if (existing) {
-      setUser(existing);
-      if (existing.has_dev_pass || existing.role === "admin") {
-        setIsUnlocked(true);
-      }
-    }
-  }, []);
-
-  const handleSimulatePurchase = () => {
-    if (!user) {
-      setIsAuthOpen(true);
-      return;
-    }
-    const updated: UserProfile = { ...user, has_dev_pass: true };
-    setLocalAuthState(updated);
-    setUser(updated);
-    setIsUnlocked(true);
+  // Signed-out visitors get sent to sign in; signed-in users without a pass go
+  // to the pricing section to purchase one (real entitlement lives on the
+  // profile's has_dev_pass flag).
+  const handleUnlock = () => {
+    router.push(user ? "/#pricing-section" : "/login?next=/dev-journey");
   };
 
   return (
     <div className="min-h-screen flex flex-col font-mono selection:bg-void-purple selection:text-white">
-      <Header
-        mode="developer"
-        onModeChange={() => {}}
-        user={user}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onLogout={() => {
-          setLocalAuthState(null);
-          setUser(null);
-          setIsUnlocked(false);
-        }}
-      />
+      <Header mode="developer" onModeChange={() => {}} user={user} />
 
       <main id="main-content" className="flex-1 max-w-7xl mx-auto px-4 md:px-6 py-10 w-full">
         <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-white mb-6">
@@ -97,7 +74,7 @@ export default function DevJourneyPage() {
               </span>
             ) : (
               <button
-                onClick={handleSimulatePurchase}
+                onClick={handleUnlock}
                 className="px-5 py-2.5 rounded-full bg-gradient-to-r from-void-purple to-void-blue text-white font-bold text-xs glow-purple hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5"
               >
                 <Lock className="w-4 h-4" /> Unlock Builder Pass ($15)
@@ -137,7 +114,7 @@ export default function DevJourneyPage() {
                       Unlock the $15 Watch-the-Dev Builder Pass to view unfiltered YouTube unlisted video logs and engineering tutorials.
                     </p>
                     <button
-                      onClick={handleSimulatePurchase}
+                      onClick={handleUnlock}
                       className="px-6 py-3 rounded-xl bg-void-purple hover:bg-purple-600 text-white font-bold text-xs glow-purple transition-all"
                     >
                       Unlock Pass for $15
@@ -156,7 +133,6 @@ export default function DevJourneyPage() {
       </main>
 
       <VisitorAiChatbot />
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onSuccess={(u) => setUser(u)} />
     </div>
   );
 }

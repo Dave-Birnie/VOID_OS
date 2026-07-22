@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { getUserAndProfile } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Admin CMS",
@@ -6,6 +8,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return children;
+// Server-side gate for the entire admin backend. The middleware guarantees the
+// visitor is signed in; here we enforce that their database role is `admin`.
+export default async function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, profile } = await getUserAndProfile();
+  if (!user) redirect("/login?next=/admin");
+  if (profile?.role !== "admin") redirect("/");
+
+  return <>{children}</>;
 }

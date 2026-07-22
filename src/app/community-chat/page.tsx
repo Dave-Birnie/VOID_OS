@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
-import { AuthModal } from "@/components/AuthModal";
 import { VisitorAiChatbot } from "@/components/VisitorAiChatbot";
-import { getLocalAuthState, setLocalAuthState, UserProfile, CommunityMessage } from "@/lib/supabase/client";
-import { MessageSquare, Send, ArrowLeft, Shield, User, Sparkles, CheckCircle2 } from "lucide-react";
+import { CommunityMessage } from "@/lib/supabase/client";
+import { useSessionProfile } from "@/lib/useSessionProfile";
+import { MessageSquare, Send, ArrowLeft, Shield, User } from "lucide-react";
 
 export default function CommunityChatPage() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const router = useRouter();
+  const { profile: user } = useSessionProfile();
   const [messages, setMessages] = useState<CommunityMessage[]>([
     {
       id: "m1",
@@ -29,17 +30,12 @@ export default function CommunityChatPage() {
   ]);
   const [input, setInput] = useState("");
 
-  useEffect(() => {
-    const existing = getLocalAuthState();
-    if (existing) setUser(existing);
-  }, []);
-
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
     if (!user) {
-      setIsAuthOpen(true);
+      router.push("/login?next=/community-chat");
       return;
     }
 
@@ -57,16 +53,7 @@ export default function CommunityChatPage() {
 
   return (
     <div className="min-h-screen flex flex-col font-mono selection:bg-void-purple selection:text-white">
-      <Header
-        mode="consumer"
-        onModeChange={() => {}}
-        user={user}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onLogout={() => {
-          setLocalAuthState(null);
-          setUser(null);
-        }}
-      />
+      <Header mode="consumer" onModeChange={() => {}} user={user} />
 
       <main id="main-content" className="flex-1 max-w-4xl mx-auto px-4 md:px-6 py-10 w-full">
         <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-white mb-6">
@@ -134,7 +121,6 @@ export default function CommunityChatPage() {
       </main>
 
       <VisitorAiChatbot />
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onSuccess={(u) => setUser(u)} />
     </div>
   );
 }

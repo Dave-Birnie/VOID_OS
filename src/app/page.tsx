@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { SplashScreen } from "@/components/SplashScreen";
 import { ModeSelect } from "@/components/ModeSelect";
-import { AuthModal } from "@/components/AuthModal";
 import { VisitorAiChatbot } from "@/components/VisitorAiChatbot";
 import { Simulator } from "@/components/Simulator";
 import { AiCreditWidget } from "@/components/AiCreditWidget";
 import { Waitlist } from "@/components/Waitlist";
-import { getLocalAuthState, setLocalAuthState, UserProfile, isAdminEmail } from "@/lib/supabase/client";
+import { useSessionProfile } from "@/lib/useSessionProfile";
 import {
   Gamepad2,
   CheckCircle2,
@@ -30,32 +30,16 @@ import {
 } from "lucide-react";
 
 export default function HomePage() {
+  const router = useRouter();
   const [showSplash, setShowSplash] = useState(true);
   const [modeChosen, setModeChosen] = useState(false);
   const [mode, setMode] = useState<"consumer" | "developer">("consumer");
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [includeAiUpgrade, setIncludeAiUpgrade] = useState(true);
 
-  useEffect(() => {
-    const existingUser = getLocalAuthState();
-    if (existingUser) {
-      // Auto-upgrade an allowlisted email to admin (e.g. accounts created
-      // before admin recognition existed).
-      if (isAdminEmail(existingUser.email) && existingUser.role !== "admin") {
-        const upgraded: UserProfile = { ...existingUser, role: "admin" };
-        setLocalAuthState(upgraded);
-        setUser(upgraded);
-      } else {
-        setUser(existingUser);
-      }
-    }
-  }, []);
+  // Real Supabase session (replaces the old localStorage demo state).
+  const { profile: user } = useSessionProfile();
 
-  const handleLogout = () => {
-    setLocalAuthState(null);
-    setUser(null);
-  };
+  const goToLogin = () => router.push("/login");
 
   const isDev = mode === "developer";
 
@@ -132,13 +116,7 @@ export default function HomePage() {
       )}
 
       {/* Header Navbar */}
-      <Header
-        mode={mode}
-        onModeChange={(m) => setMode(m)}
-        user={user}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onLogout={handleLogout}
-      />
+      <Header mode={mode} onModeChange={(m) => setMode(m)} user={user} />
 
       <main id="main-content" className="flex-1">
         {/* HERO SECTION */}
@@ -183,7 +161,7 @@ export default function HomePage() {
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto sm:max-w-none">
             <button
-              onClick={() => setIsAuthOpen(true)}
+              onClick={goToLogin}
               className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-mono font-bold text-xs bg-gradient-to-r ${t.ctaGrad} text-white hover:opacity-95 transition-all ${t.glow} flex items-center justify-center gap-2 min-h-[44px]`}
             >
               <UserCheck className="w-4 h-4" /> Register Free Account
@@ -201,7 +179,7 @@ export default function HomePage() {
         {/* AI CREDIT WIDGET DISPLAY (FOR LOGGED IN USERS) */}
         {user && (
           <section className="max-w-7xl mx-auto px-4 md:px-6 py-4">
-            <AiCreditWidget user={user} onUpdateProfile={(u) => setUser(u)} />
+            <AiCreditWidget user={user} />
           </section>
         )}
 
@@ -385,7 +363,7 @@ export default function HomePage() {
                         Add AI Upgrade <span className="text-void-cyan">+$10.00 / mo</span>
                       </h4>
                       <p className="text-[10px] text-zinc-400">
-                        Uses server-side OpenAI credits with dual bank tracking (Monthly Allowance + Top-Up Credits).
+                        Uses server-side Google Gemini credits with dual bank tracking (Monthly Allowance + Top-Up Credits).
                       </p>
                     </div>
                   </div>
@@ -431,7 +409,7 @@ export default function HomePage() {
                     </ul>
                   </div>
                   <button
-                    onClick={() => setIsAuthOpen(true)}
+                    onClick={goToLogin}
                     className="mt-8 w-full py-3 rounded-xl border border-zinc-800 hover:border-purple-500/40 text-center font-bold text-xs text-zinc-300 hover:text-white bg-black/40 min-h-[44px]"
                   >
                     Select Starter
@@ -473,7 +451,7 @@ export default function HomePage() {
                     </ul>
                   </div>
                   <button
-                    onClick={() => setIsAuthOpen(true)}
+                    onClick={goToLogin}
                     className="mt-8 w-full py-3 rounded-xl bg-gradient-to-r from-void-purple to-void-blue text-white font-bold text-xs glow-purple min-h-[44px]"
                   >
                     Select Pro Standard
@@ -512,7 +490,7 @@ export default function HomePage() {
                     </ul>
                   </div>
                   <button
-                    onClick={() => setIsAuthOpen(true)}
+                    onClick={goToLogin}
                     className="mt-8 w-full py-3 rounded-xl border border-zinc-800 hover:border-cyan-500/40 text-center font-bold text-xs text-zinc-300 hover:text-white bg-black/40 min-h-[44px]"
                   >
                     Select All-Access
@@ -582,7 +560,7 @@ export default function HomePage() {
                       </ul>
                     </div>
                     <button
-                      onClick={() => setIsAuthOpen(true)}
+                      onClick={goToLogin}
                       className={`mt-8 w-full py-3 rounded-xl font-bold text-xs min-h-[44px] transition-all ${
                         pack.highlight
                           ? "bg-gradient-to-r from-void-blue to-void-cyan text-white glow-blue"
@@ -620,7 +598,7 @@ export default function HomePage() {
                     <div className="text-4xl font-black text-white">$2,500</div>
                     <div className="text-[10px] text-amber-300/80 uppercase tracking-wide mb-3">5 seats · campaign only</div>
                     <button
-                      onClick={() => setIsAuthOpen(true)}
+                      onClick={goToLogin}
                       className="w-full lg:w-auto px-8 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs min-h-[44px] transition-all"
                     >
                       Claim a VIP Seat
@@ -635,13 +613,6 @@ export default function HomePage() {
 
       {/* Floating Public Gideon Assistant */}
       <VisitorAiChatbot />
-
-      {/* Register/Login Modal */}
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onSuccess={(u) => setUser(u)}
-      />
 
       {/* Footer */}
       <footer className="border-t border-zinc-800/80 py-8 px-4 font-mono text-center text-xs text-zinc-500 bg-black/40">

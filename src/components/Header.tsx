@@ -2,24 +2,28 @@
 
 import React from "react";
 import Link from "next/link";
-import { User, Code, LogIn, LogOut, Shield, Sparkles, MessageSquare, Video, FileText } from "lucide-react";
-import { UserProfile } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { User, Code, LogIn, LogOut, Shield, MessageSquare, Video, FileText } from "lucide-react";
+import { UserProfile, createBrowserSupabase } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 interface HeaderProps {
   mode: "consumer" | "developer";
   onModeChange: (mode: "consumer" | "developer") => void;
   user: UserProfile | null;
-  onOpenAuth: () => void;
-  onLogout: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  mode,
-  onModeChange,
-  user,
-  onOpenAuth,
-  onLogout,
-}) => {
+export const Header: React.FC<HeaderProps> = ({ mode, onModeChange, user }) => {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    if (isSupabaseConfigured()) {
+      await createBrowserSupabase().auth.signOut();
+    }
+    router.push("/");
+    router.refresh();
+  };
+
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-void-black/80 border-b border-zinc-800/80 py-3.5 px-4 md:px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -120,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </Link>
               )}
               <button
-                onClick={onLogout}
+                onClick={handleLogout}
                 title="Sign Out"
                 aria-label="Sign out"
                 className="p-2 rounded-xl border border-zinc-800 hover:border-red-500/50 text-zinc-400 hover:text-red-400 transition-all bg-black/30"
@@ -129,13 +133,13 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
           ) : (
-            <button
-              onClick={onOpenAuth}
+            <Link
+              href="/login"
               className="px-4 py-2 rounded-full font-mono font-bold text-xs tracking-wider uppercase transition-all bg-gradient-to-r from-void-purple to-void-blue text-white glow-purple hover:scale-105 active:scale-95 flex items-center gap-1.5"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Register Free</span>
-            </button>
+              <span>Sign In</span>
+            </Link>
           )}
         </div>
       </div>

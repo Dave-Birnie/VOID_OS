@@ -1,0 +1,35 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="voidGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <radialGradient id="voidBg" cx="50%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#1a1033" />
+      <stop offset="100%" stop-color="#08070d" />
+    </radialGradient>
+    <filter id="voidGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="b" />
+      <feMerge>
+        <feMergeNode in="b" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Dark rounded badge with a faint brand ring -->
+  <rect x="16" y="16" width="480" height="480" rx="116" fill="url(#voidBg)" />
+  <rect x="16" y="16" width="480" height="480" rx="116" fill="none" stroke="url(#voidGrad)" stroke-width="8" opacity="0.55" />
+
+  <!-- VOID OS mark: broken-ring arcs + downward chevron -->
+  <g transform="translate(106,106) scale(1.5)" filter="url(#voidGlow)">
+    <g fill="none" stroke="url(#voidGrad)" stroke-width="16" stroke-linecap="round">
+      <path d="M 100,20 A 80,80 0 0,1 175,75" />
+      <path d="M 100,20 A 80,80 0 0,0 25,75" />
+      <path d="M 25,125 A 80,80 0 0,0 100,180" />
+      <path d="M 175,125 A 80,80 0 0,1 100,180" />
+    </g>
+    <path d="M 30,75 L 100,165 L 170,75 L 132,75 L 100,125 L 68,75 Z" fill="url(#voidGrad)" />
+  </g>
+</svg>
