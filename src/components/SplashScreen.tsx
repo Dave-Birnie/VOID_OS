@@ -66,7 +66,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onDismiss }) => {
       <div className="relative flex flex-col items-center w-full max-w-md text-center">
         {/* Glowing Logo Emblem */}
         <div className="relative w-36 h-36 animate-pulse mb-6">
-          <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-[0_0_25px_rgba(168,85,247,0.7)]">
+          <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false" className="w-full h-full drop-shadow-[0_0_25px_rgba(168,85,247,0.7)]">
             <defs>
               <linearGradient id="splashLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#a855f7" />

@@ -133,14 +133,15 @@ export const VisitorAiChatbot: React.FC = () => {
             </div>
             <button
               onClick={() => setIsOpen(false)}
+              aria-label="Close chat"
               className="p-1.5 text-zinc-400 hover:text-white rounded-full bg-black/40 hover:bg-zinc-800 transition-colors"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
 
           {/* Messages list */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 font-mono text-xs">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 font-mono text-xs" aria-live="polite" role="log">
             {messages.map((m, i) => (
               <div
                 key={i}
@@ -197,13 +198,15 @@ export const VisitorAiChatbot: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask Gideon about VOID OS..."
+              aria-label="Ask Gideon a question"
               className="flex-1 px-3.5 py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 text-xs text-white focus:outline-none focus:border-void-purple min-h-[44px]"
             />
             <button
               type="submit"
+              aria-label="Send message"
               className="p-3 rounded-xl bg-void-purple hover:bg-purple-600 text-white glow-purple transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4" aria-hidden="true" />
             </button>
           </form>
         </div>

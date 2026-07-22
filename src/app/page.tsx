@@ -119,7 +119,7 @@ export default function HomePage() {
         onLogout={handleLogout}
       />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* HERO SECTION */}
         <section className="max-w-7xl mx-auto px-4 md:px-6 pt-12 md:pt-16 pb-12 text-center relative">
           <div className="absolute inset-0 -z-10 flex items-center justify-center opacity-20 pointer-events-none">

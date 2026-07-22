@@ -24,9 +24,9 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-40 backdrop-blur-md bg-void-black/80 border-b border-zinc-800/80 py-3.5 px-4 md:px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand Logo & Name */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" aria-label="VOID OS home" className="flex items-center gap-3 group">
           <div className="w-9 h-9 relative">
-            <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:scale-105 transition-transform">
+            <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false" className="w-full h-full drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:scale-105 transition-transform">
               <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" strokeWidth="12"/>
               <path d="M 100,20 A 80,80 0 0,0 25,75" fill="none" stroke="url(#logoGrad)" strokeWidth="12"/>
               <path d="M 25,125 A 80,80 0 0,0 100,180" fill="none" stroke="url(#logoGrad)" strokeWidth="12"/>
@@ -71,23 +71,27 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="bg-zinc-900/90 p-1 rounded-full border border-zinc-800 flex items-center shadow-inner">
             <button
               onClick={() => onModeChange("consumer")}
+              aria-label="Switch to Consumer mode"
+              aria-pressed={mode === "consumer"}
               className={`px-3 py-1 md:px-3.5 md:py-1 rounded-full text-[10px] md:text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
                 mode === "consumer"
                   ? "bg-void-purple text-white shadow-md glow-purple"
                   : "text-zinc-400 hover:text-white"
               }`}
             >
-              <User className="w-3 h-3" /> <span className="hidden sm:inline">Consumer</span>
+              <User className="w-3 h-3" aria-hidden="true" /> <span className="hidden sm:inline">Consumer</span>
             </button>
             <button
               onClick={() => onModeChange("developer")}
+              aria-label="Switch to Developer mode"
+              aria-pressed={mode === "developer"}
               className={`px-3 py-1 md:px-3.5 md:py-1 rounded-full text-[10px] md:text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
                 mode === "developer"
                   ? "bg-void-cyan text-slate-950 shadow-md glow-cyan"
                   : "text-zinc-400 hover:text-white"
               }`}
             >
-              <Code className="w-3 h-3" /> <span className="hidden sm:inline">Developer</span>
+              <Code className="w-3 h-3" aria-hidden="true" /> <span className="hidden sm:inline">Developer</span>
             </button>
           </div>
 
@@ -103,9 +107,10 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={onLogout}
                 title="Sign Out"
+                aria-label="Sign out"
                 className="p-2 rounded-xl border border-zinc-800 hover:border-red-500/50 text-zinc-400 hover:text-red-400 transition-all bg-black/30"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
           ) : (

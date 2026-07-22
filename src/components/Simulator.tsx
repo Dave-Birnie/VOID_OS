@@ -100,7 +100,7 @@ export const Simulator: React.FC = () => {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-void-card border border-zinc-800 p-1.5 rounded-xl flex items-center justify-center">
-                    <svg viewBox="0 0 200 200" className="w-full h-full">
+                    <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false" className="w-full h-full">
                       <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" strokeWidth="16"/>
                       <path d="M 100,20 A 80,80 0 0,0 25,75" fill="none" stroke="url(#logoGrad)" strokeWidth="16"/>
                       <path d="M 25,125 A 80,80 0 0,0 100,180" fill="none" stroke="url(#logoGrad)" strokeWidth="16"/>

@@ -74,7 +74,7 @@ export default function DevJourneyPage() {
         }}
       />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 py-10 w-full">
+      <main id="main-content" className="flex-1 max-w-7xl mx-auto px-4 md:px-6 py-10 w-full">
         <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-white mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to Overview
         </Link>

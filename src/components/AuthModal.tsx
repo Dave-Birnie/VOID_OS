@@ -66,19 +66,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={tab === "register" ? "Register a free account" : "Sign in"}
+    >
       <div className="bg-[#100f1a] w-full max-w-md rounded-3xl border border-purple-500/30 p-6 md:p-8 relative shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label="Close dialog"
           className="absolute top-5 right-5 p-2 text-zinc-400 hover:text-white rounded-full bg-black/40 hover:bg-zinc-800 transition-colors"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4" aria-hidden="true" />
         </button>
 
         <div className="text-center mb-6">
           <div className="w-12 h-12 mx-auto mb-3">
-            <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-[0_0_12px_rgba(168,85,247,0.6)]">
+            <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false" className="w-full h-full drop-shadow-[0_0_12px_rgba(168,85,247,0.6)]">
               <path d="M 100,20 A 80,80 0 0,1 175,75" fill="none" stroke="url(#logoGrad)" strokeWidth="14"/>
               <path d="M 100,20 A 80,80 0 0,0 25,75" fill="none" stroke="url(#logoGrad)" strokeWidth="14"/>
               <path d="M 25,125 A 80,80 0 0,0 100,180" fill="none" stroke="url(#logoGrad)" strokeWidth="14"/>
