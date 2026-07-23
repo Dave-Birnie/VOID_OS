@@ -20,6 +20,7 @@ export interface ProfileInitial {
   github_url: string;
   youtube_url: string;
   is_founding_backer: boolean;
+  show_on_leaderboard: boolean;
 }
 
 const inputCls =
@@ -156,6 +157,10 @@ export function ProfileEditor({ initial, userId }: { initial: ProfileInitial; us
             <input name="youtube_url" defaultValue={initial.youtube_url} placeholder="youtube.com/@you" className={inputCls} />
           </div>
         </div>
+        <label className="flex items-center gap-2.5 text-sm themed-text pt-1 cursor-pointer select-none">
+          <input type="checkbox" name="show_on_leaderboard" defaultChecked={initial.show_on_leaderboard} className="w-4 h-4 rounded accent-[var(--accent)]" />
+          Show me on the public <span className="font-bold">leaderboard</span>
+        </label>
         <button type="submit" className="px-5 py-2.5 rounded-xl themed-accent-bg font-bold text-xs">Save profile</button>
         {status && <p className={`text-xs mt-3 ${status.ok ? "text-emerald-400" : "text-red-400"}`}>{status.msg}</p>}
       </form>
