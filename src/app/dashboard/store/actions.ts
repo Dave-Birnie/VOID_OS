@@ -23,6 +23,7 @@ export async function activateApp(formData: FormData) {
     { user_id: userId, app_id: appId, active: true, activated_at: new Date().toISOString() },
     { onConflict: "user_id,app_id" }
   );
+  await supabase.rpc("evaluate_badges", { p_user: userId });
   revalidatePath("/dashboard/store");
   revalidatePath("/dashboard");
 }

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Globe, Github, Youtube, MapPin, BadgeCheck, Shield, ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/Avatar";
+import { BadgeList } from "@/components/BadgeList";
 import { statLevel } from "@/lib/lifeStats";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +26,8 @@ type PublicProfile = {
   created_at: string;
   apps_active: number;
   life_score: number;
+  referral_count: number;
+  badges: string[];
 };
 
 async function fetchProfile(handle: string): Promise<PublicProfile | null> {
@@ -117,11 +120,19 @@ export default async function PublicProfilePage({ params }: { params: { handle: 
 
           {p.bio && <p className="mt-5 text-sm themed-text leading-relaxed whitespace-pre-line">{p.bio}</p>}
 
+          {/* Badges */}
+          {p.badges && p.badges.length > 0 && (
+            <div className="mt-6">
+              <h2 className="font-mono themed-muted text-[10px] font-bold tracking-[0.2em] uppercase mb-2">Achievements</h2>
+              <BadgeList earned={p.badges} size="sm" />
+            </div>
+          )}
+
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mt-6">
             <StatChip label="Level" value={String(level)} />
             <StatChip label="Apps active" value={String(p.apps_active)} />
-            <StatChip label="Since" value={since} />
+            <StatChip label="Invited" value={String(p.referral_count ?? 0)} />
           </div>
 
           {/* Links */}

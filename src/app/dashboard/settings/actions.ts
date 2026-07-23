@@ -104,6 +104,8 @@ export async function saveProfile(formData: FormData): Promise<SettingsResult> {
     }
     return { ok: false, error: error.message };
   }
+  // Completing your profile / claiming a handle can earn badges.
+  await supabase.rpc("evaluate_badges", { p_user: user.id });
   revalidatePath("/dashboard");
   if (handle) revalidatePath(`/u/${handle}`);
   return { ok: true };
