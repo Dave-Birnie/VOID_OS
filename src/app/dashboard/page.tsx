@@ -9,6 +9,7 @@ import { TodayView } from "@/components/widgets/TodayView";
 import { LifeStats } from "@/components/widgets/LifeStats";
 import { parseInspirations, verseForDay, quoteForDay, todayKey } from "@/lib/inspirations";
 import { ReferralCard } from "@/components/ReferralCard";
+import { ReferralLadder } from "@/components/ReferralLadder";
 import { BadgeList } from "@/components/BadgeList";
 import { siteConfig } from "@/lib/site";
 import { Store, Video, MessageSquare, Lock, ArrowRight, Trophy } from "lucide-react";
@@ -107,7 +108,10 @@ export default async function DashboardPage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {referralCode && <ReferralCard code={referralCode} count={referralCount} baseUrl={siteConfig.url} />}
+          <div className="space-y-3">
+            {referralCode && <ReferralCard code={referralCode} count={referralCount} baseUrl={siteConfig.url} />}
+            <ReferralLadder count={referralCount} />
+          </div>
           <div className="themed-card border themed-border rounded-2xl p-5">
             <div className="flex items-center justify-between gap-3 mb-1">
               <h3 className="flex items-center gap-2 font-bold themed-text text-sm">

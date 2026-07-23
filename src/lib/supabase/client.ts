@@ -40,6 +40,7 @@ export interface UserProfile {
   avatar_url?: string | null;
   handle?: string | null;
   is_founding_backer?: boolean;
+  early_access?: boolean;
 }
 
 export interface ChatTranscript {
