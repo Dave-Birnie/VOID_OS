@@ -58,6 +58,9 @@ export default function HomePage() {
 
   const goToLogin = () => router.push("/login");
 
+  // Pledges happen on Kickstarter — the tier CTAs link out here.
+  const KICKSTARTER_URL = process.env.NEXT_PUBLIC_KICKSTARTER_URL || "#";
+
   const isDev = mode === "developer";
 
   // Mode-driven theming: consumer = purple, developer = blue.
@@ -211,7 +214,7 @@ export default function HomePage() {
               href="#pricing-section"
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-mono font-bold text-xs border border-zinc-800 hover:border-purple-500/40 text-zinc-300 hover:text-white transition-all bg-black/40 flex items-center justify-center gap-2 min-h-[44px]"
             >
-              {isDev ? "View Developer Passes ($100+)" : "View VOID Online Pricing ($10/mo)"}
+              {isDev ? "View Kickstarter Tiers ($10+)" : "See VOID Online (coming later)"}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -340,7 +343,7 @@ export default function HomePage() {
                 EXCLUSIVES IN THE LAB
               </span>
               <h2 className="text-2xl md:text-3xl font-black text-white">
-                The $15 &quot;Watch-The-Dev&quot; Builder Pass
+                The $25 &quot;Watch-The-Dev&quot; Kickstarter Tier
               </h2>
               <p className="text-zinc-400 text-xs md:text-sm leading-relaxed">
                 Be part of the active 3amCEO dev ecosystem. Instead of pre-ordering blindly, get lifetime access to the <strong>Watch-the-Dev Portal</strong>.
@@ -368,8 +371,8 @@ export default function HomePage() {
             </div>
 
             <div className="lg:w-1/2 w-full bg-black/60 border border-zinc-800 p-6 rounded-2xl font-mono text-center">
-              <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">LIMITED KICKSTARTER PASS</span>
-              <div className="mt-2 text-3xl font-black text-white">$15 <span className="text-xs text-zinc-400 font-normal">($25 post-campaign)</span></div>
+              <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">KICKSTARTER TIER</span>
+              <div className="mt-2 text-3xl font-black text-white">$25 <span className="text-xs text-zinc-400 font-normal">one-time pledge</span></div>
               <p className="text-xs text-zinc-400 mt-2 mb-6">Unlock immediate portal access + weekly devlogs + community chat.</p>
 
               <a
@@ -388,9 +391,12 @@ export default function HomePage() {
             /* CONSUMER MODE: SaaS PRICING TIERS */
             <div>
               <div className="text-center max-w-2xl mx-auto mb-8">
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white">VOID Online Plans</h2>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-amber-500/40 bg-amber-950/25 text-[10px] text-amber-300 uppercase tracking-widest font-bold mb-4">
+                  <Tag className="w-3.5 h-3.5" /> Coming after the campaign
+                </div>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white">VOID Online — Hosted Plans</h2>
                 <p className="text-zinc-400 mt-2 text-xs md:text-sm">
-                  Fully hosted and ready to use — sign in and start, zero configuration required.
+                  A fully-hosted, monthly version of VOID OS is planned for <strong className="text-amber-300">after the Kickstarter</strong>. These plans are a preview — they are <strong>not</strong> part of the current campaign, which delivers source code (see the Developer tab).
                 </p>
 
                 {/* +$10/mo AI Upgrade Toggle Card */}
@@ -453,7 +459,7 @@ export default function HomePage() {
                     onClick={goToLogin}
                     className="mt-8 w-full py-3 rounded-xl border border-zinc-800 hover:border-purple-500/40 text-center font-bold text-xs text-zinc-300 hover:text-white bg-black/40 min-h-[44px]"
                   >
-                    Select Starter
+                    Notify me at launch
                   </button>
                 </div>
 
@@ -495,7 +501,7 @@ export default function HomePage() {
                     onClick={goToLogin}
                     className="mt-8 w-full py-3 rounded-xl bg-gradient-to-r from-void-purple to-void-blue text-white font-bold text-xs glow-purple min-h-[44px]"
                   >
-                    Select Pro Standard
+                    Notify me at launch
                   </button>
                 </div>
 
@@ -534,23 +540,38 @@ export default function HomePage() {
                     onClick={goToLogin}
                     className="mt-8 w-full py-3 rounded-xl border border-zinc-800 hover:border-cyan-500/40 text-center font-bold text-xs text-zinc-300 hover:text-white bg-black/40 min-h-[44px]"
                   >
-                    Select All-Access
+                    Notify me at launch
                   </button>
                 </div>
               </div>
             </div>
           ) : (
-            /* DEVELOPER MODE: DEVELOPER & SELF-HOSTER PASSES */
+            /* DEVELOPER MODE: KICKSTARTER PLEDGE TIERS */
             <div>
-              <div className="text-center max-w-2xl mx-auto mb-8">
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white">Developer &amp; Self-Hoster Passes</h2>
-                <p className="text-zinc-400 mt-2 text-xs md:text-sm">
-                  One-time purchases with full source code, self-hosting scripts, and complete data sovereignty (BYOK AI model).
-                </p>
-                <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/40 bg-blue-950/25 text-[10px] text-blue-300 uppercase tracking-widest font-bold">
-                  <Tag className="w-3.5 h-3.5" /> Kickstarter prices are limited-time deals
+              <div className="text-center max-w-2xl mx-auto mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-void-cyan/50 bg-cyan-950/25 text-[10px] text-void-cyan uppercase tracking-widest font-bold mb-4">
+                  <span className="w-2 h-2 rounded-full bg-void-cyan animate-ping" /> Kickstarter Campaign
                 </div>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white">Kickstarter Pledge Tiers</h2>
+                <p className="text-zinc-400 mt-2 text-xs md:text-sm">
+                  Back VOID OS on Kickstarter. Every tier is a one-time pledge that delivers source code, self-host bundles, and (higher tiers) BYOK AI integration — no subscription, no in-app billing.
+                </p>
               </div>
+
+              {/* Prominent Kickstarter banner */}
+              <a
+                href={KICKSTARTER_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-8 px-6 py-4 rounded-2xl bg-gradient-to-r from-void-blue/20 to-void-cyan/10 border border-void-cyan/40 hover:border-void-cyan transition-all"
+              >
+                <span className="text-sm font-bold text-white text-center sm:text-left">
+                  🚀 Pledges are made on Kickstarter — pick a tier below, then back it on the campaign page.
+                </span>
+                <span className="flex-shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-r from-void-blue to-void-cyan text-white font-bold text-xs glow-blue flex items-center gap-1.5">
+                  Back on Kickstarter <ArrowRight className="w-4 h-4" />
+                </span>
+              </a>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
                 {devPacks.map((pack) => (
@@ -603,9 +624,11 @@ export default function HomePage() {
                         ))}
                       </ul>
                     </div>
-                    <button
-                      onClick={goToLogin}
-                      className={`mt-8 w-full py-3 rounded-xl font-bold text-xs min-h-[44px] transition-all ${
+                    <a
+                      href={KICKSTARTER_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`mt-8 w-full py-3 rounded-xl font-bold text-xs min-h-[44px] transition-all flex items-center justify-center gap-1.5 ${
                         pack.vip
                           ? "bg-amber-500 hover:bg-amber-400 text-black"
                           : pack.highlight
@@ -613,8 +636,8 @@ export default function HomePage() {
                           : "border border-zinc-800 hover:border-blue-500/40 text-zinc-300 hover:text-white bg-black/40"
                       }`}
                     >
-                      {pack.vip ? "Claim a VIP Seat" : `Back — ${pack.price}`}
-                    </button>
+                      {pack.vip ? "Back the VIP tier" : `Pledge ${pack.price}`}
+                    </a>
                   </div>
                 ))}
               </div>
