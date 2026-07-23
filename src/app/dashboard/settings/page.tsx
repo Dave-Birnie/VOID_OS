@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getUserAndProfile } from "@/lib/auth";
 import { SettingsClient, type SettingsInitial } from "./SettingsClient";
+import type { ProfileInitial } from "@/components/ProfileEditor";
 import type { ThemeId } from "@/lib/theme";
 
 export const metadata = { title: "Settings" };
@@ -10,7 +11,9 @@ export default async function SettingsPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("profiles")
-    .select("full_name, nickname, timezone, theme, font_size, app_settings")
+    .select(
+      "full_name, nickname, timezone, theme, font_size, app_settings, avatar_url, handle, tagline, bio, location, website_url, x_url, github_url, youtube_url, is_founding_backer"
+    )
     .eq("id", user!.id)
     .single();
 
@@ -32,5 +35,19 @@ export default async function SettingsPage() {
     ai_has_key: !!ai.key,
   };
 
-  return <SettingsClient initial={initial} />;
+  const profile: ProfileInitial = {
+    avatar_url: (p.avatar_url as string) ?? null,
+    full_name: (p.full_name as string) ?? "",
+    handle: (p.handle as string) ?? "",
+    tagline: (p.tagline as string) ?? "",
+    bio: (p.bio as string) ?? "",
+    location: (p.location as string) ?? "",
+    website_url: (p.website_url as string) ?? "",
+    x_url: (p.x_url as string) ?? "",
+    github_url: (p.github_url as string) ?? "",
+    youtube_url: (p.youtube_url as string) ?? "",
+    is_founding_backer: !!p.is_founding_backer,
+  };
+
+  return <SettingsClient initial={initial} profile={profile} userId={user!.id} />;
 }

@@ -62,6 +62,68 @@ export async function saveAccount(formData: FormData): Promise<SettingsResult> {
   return { ok: true };
 }
 
+// Save the public-profile fields (avatar picture, handle, bio, links). The
+// handle is validated and its uniqueness surfaced as a friendly error.
+export async function saveProfile(formData: FormData): Promise<SettingsResult> {
+  const { user } = await getUserAndProfile();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const str = (k: string, max: number) => ((formData.get(k) as string) ?? "").trim().slice(0, max) || null;
+
+  const rawHandle = ((formData.get("handle") as string) ?? "").trim().toLowerCase();
+  let handle: string | null = null;
+  if (rawHandle) {
+    if (!/^[a-z0-9_]{3,20}$/.test(rawHandle)) {
+      return { ok: false, error: "Handle must be 3–20 characters: lowercase letters, numbers, or underscores." };
+    }
+    handle = rawHandle;
+  }
+
+  const url = (k: string): string | null => {
+    const v = str(k, 200);
+    if (!v) return null;
+    return /^https?:\/\//i.test(v) ? v : `https://${v}`;
+  };
+
+  const patch: Record<string, unknown> = {
+    handle,
+    tagline: str("tagline", 80),
+    bio: str("bio", 400),
+    location: str("location", 60),
+    website_url: url("website_url"),
+    x_url: url("x_url"),
+    github_url: url("github_url"),
+    youtube_url: url("youtube_url"),
+  };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
+  if (error) {
+    if (error.code === "23505" || /duplicate|unique/i.test(error.message)) {
+      return { ok: false, error: "That handle is already taken — try another." };
+    }
+    return { ok: false, error: error.message };
+  }
+  revalidatePath("/dashboard");
+  if (handle) revalidatePath(`/u/${handle}`);
+  return { ok: true };
+}
+
+// Persist the uploaded avatar's public URL. The file itself is uploaded from
+// the browser straight to Storage (owner-only bucket path); we just record it.
+export async function saveAvatar(url: string): Promise<SettingsResult> {
+  const { user } = await getUserAndProfile();
+  if (!user) return { ok: false, error: "Not signed in." };
+  const clean = (url ?? "").trim().slice(0, 400);
+  if (clean && !/^https?:\/\//i.test(clean)) return { ok: false, error: "Invalid image URL." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("profiles").update({ avatar_url: clean || null }).eq("id", user.id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
 // Save the user's BYOK AI provider settings. The key is left unchanged if the
 // field is blank, so it isn't wiped when only the provider/model changes.
 // (TODO: encrypt the key at rest — see Master Plan; MVP stores it in app_settings.)
