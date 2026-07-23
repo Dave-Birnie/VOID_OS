@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { siteConfig } from "@/lib/site";
+import { PageViewTracker } from "@/components/PageViewTracker";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -176,6 +177,9 @@ export default function RootLayout({
         </svg>
 
         {children}
+
+        {/* First-party, cookie-free page-view tracking */}
+        <PageViewTracker />
 
         <script
           type="application/ld+json"
