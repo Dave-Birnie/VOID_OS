@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Check, Palette, User, Cpu, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Palette, User, Cpu, Sparkles, IdCard } from "lucide-react";
 import { THEMES, applyTheme, type ThemeId } from "@/lib/theme";
+import { ProfileEditor, type ProfileInitial } from "@/components/ProfileEditor";
 import { saveAppearance, saveAccount, saveAiProvider, saveTodayPrefs } from "./actions";
 
 export interface SettingsInitial {
@@ -54,7 +55,15 @@ function Status({ s }: { s: { ok: boolean; msg: string } | null }) {
 const inputCls =
   "w-full px-3 py-2.5 rounded-xl border themed-border bg-[var(--surface)] themed-text text-xs focus:outline-none focus:border-[color:var(--accent)] min-h-[44px]";
 
-export function SettingsClient({ initial }: { initial: SettingsInitial }) {
+export function SettingsClient({
+  initial,
+  profile,
+  userId,
+}: {
+  initial: SettingsInitial;
+  profile: ProfileInitial;
+  userId: string;
+}) {
   const router = useRouter();
 
   const [theme, setTheme] = useState<ThemeId>(initial.theme);
@@ -109,6 +118,12 @@ export function SettingsClient({ initial }: { initial: SettingsInitial }) {
       <h1 className="text-3xl sm:text-4xl font-black themed-text tracking-tight mb-8">Settings</h1>
 
       <div className="space-y-6 max-w-2xl">
+        {/* Public Profile */}
+        <Section icon={<IdCard className="w-5 h-5" />} title="Public Profile">
+          <p className="text-xs themed-muted mb-5">Your picture, handle, and bio — this is what other members and visitors see.</p>
+          <ProfileEditor initial={profile} userId={userId} />
+        </Section>
+
         {/* Appearance */}
         <Section icon={<Palette className="w-5 h-5" />} title="Appearance">
           <form onSubmit={submitAppearance}>

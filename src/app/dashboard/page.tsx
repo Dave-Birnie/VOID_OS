@@ -8,7 +8,10 @@ import { WidgetBoard, type BoardItem } from "@/components/WidgetBoard";
 import { TodayView } from "@/components/widgets/TodayView";
 import { LifeStats } from "@/components/widgets/LifeStats";
 import { parseInspirations, verseForDay, quoteForDay, todayKey } from "@/lib/inspirations";
-import { Store, Video, MessageSquare, Lock, ArrowRight } from "lucide-react";
+import { ReferralCard } from "@/components/ReferralCard";
+import { BadgeList } from "@/components/BadgeList";
+import { siteConfig } from "@/lib/site";
+import { Store, Video, MessageSquare, Lock, ArrowRight, Trophy } from "lucide-react";
 
 const KICKSTARTER_URL = process.env.NEXT_PUBLIC_KICKSTARTER_URL || "#";
 
@@ -20,11 +23,22 @@ export default async function DashboardPage() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? `Morning, ${firstName}.` : hour < 18 ? `Afternoon, ${firstName}.` : `Evening, ${firstName}.`;
 
-  const [activeAppIds, settings, { data: inspRow }] = await Promise.all([
-    getActiveAppIds(supabase, user!.id),
-    getAppSettings(supabase, user!.id),
-    supabase.from("site_content").select("body").eq("key", "inspirations").maybeSingle(),
-  ]);
+  // Award any newly-earned badges (early adopter, founding backer…) up front.
+  await supabase.rpc("evaluate_badges", { p_user: user!.id });
+
+  const [activeAppIds, settings, { data: inspRow }, { data: refRow }, { count: refCount }, { data: badgeRows }] =
+    await Promise.all([
+      getActiveAppIds(supabase, user!.id),
+      getAppSettings(supabase, user!.id),
+      supabase.from("site_content").select("body").eq("key", "inspirations").maybeSingle(),
+      supabase.from("profiles").select("referral_code").eq("id", user!.id).single(),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("referred_by", user!.id),
+      supabase.from("user_badges").select("badge_id").eq("user_id", user!.id),
+    ]);
+
+  const referralCode = (refRow?.referral_code as string) ?? "";
+  const referralCount = refCount ?? 0;
+  const earnedBadges = ((badgeRows as { badge_id: string }[]) ?? []).map((b) => b.badge_id);
   const names = settings.app_names ?? {};
   const hasPass = !!(profile?.has_dev_pass || profile?.role === "admin");
 
@@ -80,6 +94,26 @@ export default async function DashboardPage() {
           title="Chat with Dev"
           sub={hasPass ? "Private line to Dave" : "Unlock on Kickstarter"}
         />
+      </section>
+
+      {/* Grow VOID OS — referrals + achievements */}
+      <section className="mb-10">
+        <h2 className="font-mono themed-accent text-[11px] font-bold tracking-[0.2em] uppercase mb-3">
+          <span className="themed-accent-2">//</span> Grow VOID OS
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {referralCode && <ReferralCard code={referralCode} count={referralCount} baseUrl={siteConfig.url} />}
+          <div className="themed-card border themed-border rounded-2xl p-5">
+            <div className="flex items-center justify-between gap-3 mb-1">
+              <h3 className="flex items-center gap-2 font-bold themed-text text-sm">
+                <Trophy className="w-4 h-4 themed-accent" /> Achievements
+              </h3>
+              <span className="text-xs themed-muted">{earnedBadges.length} earned</span>
+            </div>
+            <p className="text-xs themed-muted mb-4">Earn badges by setting up your profile, installing apps, and inviting friends.</p>
+            <BadgeList earned={earnedBadges} showLocked />
+          </div>
+        </div>
       </section>
 
       {/* Widgets */}

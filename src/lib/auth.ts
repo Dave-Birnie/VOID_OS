@@ -17,7 +17,7 @@ export async function getUserAndProfile(): Promise<{
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "id, email, full_name, role, has_dev_pass, ai_subscription_active, monthly_token_limit, monthly_tokens_used, extra_token_credits"
+      "id, email, full_name, role, has_dev_pass, ai_subscription_active, monthly_token_limit, monthly_tokens_used, extra_token_credits, avatar_url, handle, is_founding_backer"
     )
     .eq("id", user.id)
     .single();

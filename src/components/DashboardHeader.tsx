@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { LogOut, Home, Settings } from "lucide-react";
 import { ModeSwitch } from "@/components/ModeSwitch";
 import { NotificationBell, type AppNotification } from "@/components/NotificationBell";
+import { Avatar } from "@/components/Avatar";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
@@ -15,10 +16,14 @@ export function DashboardHeader({
   isAdmin,
   name,
   notifications,
+  avatarUrl,
+  handle,
 }: {
   isAdmin: boolean;
   name: string;
   notifications: AppNotification[];
+  avatarUrl?: string | null;
+  handle?: string | null;
 }) {
   const router = useRouter();
 
@@ -48,7 +53,15 @@ export function DashboardHeader({
 
         <div className="flex items-center gap-2 md:gap-3">
           {isAdmin && <ModeSwitch />}
-          <span className="hidden md:inline text-xs font-mono themed-muted">{name}</span>
+          <Link
+            href={handle ? `/u/${handle}` : "/dashboard/settings"}
+            title="Your profile"
+            aria-label="Your profile"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <span className="hidden md:inline text-xs font-mono themed-muted">{name}</span>
+            <Avatar name={name} src={avatarUrl} handle={handle} size={28} />
+          </Link>
           <NotificationBell notifications={notifications} />
           <Link
             href="/dashboard/settings"

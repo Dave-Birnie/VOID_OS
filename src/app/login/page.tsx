@@ -6,6 +6,19 @@ import Link from "next/link";
 import { Mail, Lock, User, ArrowRight, ShieldCheck } from "lucide-react";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { attachReferral } from "@/app/referral-actions";
+
+// Attribute a stashed invite code once the user has a session, then clear it.
+async function claimReferral() {
+  try {
+    const ref = localStorage.getItem("void_ref");
+    if (!ref) return;
+    const res = await attachReferral(ref);
+    if (res.ok) localStorage.removeItem("void_ref");
+  } catch {
+    /* referral attribution is best-effort */
+  }
+}
 
 type Mode = "signin" | "signup";
 
@@ -40,6 +53,7 @@ function LoginForm() {
         setLoading(false);
         return;
       }
+      await claimReferral();
       router.push(next);
       router.refresh();
     } else {
@@ -54,6 +68,7 @@ function LoginForm() {
         return;
       }
       if (data.session) {
+        await claimReferral();
         router.push(next);
         router.refresh();
       } else {

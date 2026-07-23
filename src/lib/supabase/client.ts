@@ -37,6 +37,9 @@ export interface UserProfile {
   monthly_token_limit: number;
   monthly_tokens_used: number;
   extra_token_credits: number;
+  avatar_url?: string | null;
+  handle?: string | null;
+  is_founding_backer?: boolean;
 }
 
 export interface ChatTranscript {
