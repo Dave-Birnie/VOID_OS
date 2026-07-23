@@ -1,19 +1,42 @@
 import { Sparkles } from "lucide-react";
+import type { Inspiration } from "@/lib/inspirations";
 
-// Platform widget: a daily inspiration + snapshot. Static verse for now;
-// wired to the Inspirations engine in a later phase.
-export function TodayView() {
+// Platform widget: the day's inspiration. Verse/quote visibility is per-user
+// (Settings → Today View); the content comes from the admin-editable doc.
+export function TodayView({
+  verse,
+  quote,
+  showVerse,
+  showQuote,
+}: {
+  verse: Inspiration;
+  quote: Inspiration;
+  showVerse: boolean;
+  showQuote: boolean;
+}) {
   return (
-    <div className="h-full bg-[#100f1a] border border-purple-500/30 rounded-3xl p-6 shadow-xl">
-      <div className="flex items-center gap-2 text-void-purple font-bold text-xs uppercase tracking-widest mb-3">
+    <div className="h-full themed-card themed-border border rounded-3xl p-6 shadow-xl">
+      <div className="flex items-center gap-2 themed-accent font-bold text-xs uppercase tracking-widest mb-3">
         <Sparkles className="w-4 h-4" /> Today View
       </div>
-      <blockquote className="border-l-2 border-void-purple pl-4">
-        <p className="text-white text-base md:text-lg italic leading-relaxed">
-          &ldquo;Whatever your hand finds to do, do it with your might.&rdquo;
-        </p>
-        <cite className="font-mono text-[11px] text-zinc-500 not-italic">— Ecclesiastes 9:10</cite>
-      </blockquote>
+
+      {showVerse && (
+        <blockquote className="border-l-2 pl-4 mb-4" style={{ borderColor: "var(--accent)" }}>
+          <p className="themed-text text-base italic leading-relaxed">&ldquo;{verse.text}&rdquo;</p>
+          <cite className="font-mono text-[11px] themed-muted not-italic">— {verse.attribution}</cite>
+        </blockquote>
+      )}
+
+      {showQuote && (
+        <blockquote className="border-l-2 pl-4" style={{ borderColor: "var(--accent-2)" }}>
+          <p className="themed-text text-base italic leading-relaxed">&ldquo;{quote.text}&rdquo;</p>
+          <cite className="font-mono text-[11px] themed-muted not-italic">— {quote.attribution}</cite>
+        </blockquote>
+      )}
+
+      {!showVerse && !showQuote && (
+        <p className="text-xs themed-muted">Daily encouragement is off. Turn it on in Settings → Today View.</p>
+      )}
     </div>
   );
 }

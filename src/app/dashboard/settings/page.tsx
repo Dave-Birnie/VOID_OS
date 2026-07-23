@@ -15,7 +15,9 @@ export default async function SettingsPage() {
     .single();
 
   const p = (data ?? {}) as Record<string, unknown>;
-  const ai = ((p.app_settings as Record<string, unknown>)?.ai as Record<string, unknown>) ?? {};
+  const appSettings = (p.app_settings as Record<string, unknown>) ?? {};
+  const ai = (appSettings.ai as Record<string, unknown>) ?? {};
+  const todayPref = (appSettings.today as { verses?: boolean; quotes?: boolean }) ?? {};
 
   const initial: SettingsInitial = {
     full_name: (p.full_name as string) ?? "",
@@ -23,6 +25,8 @@ export default async function SettingsPage() {
     timezone: (p.timezone as string) ?? "",
     theme: (["dark", "light", "void"].includes(p.theme as string) ? p.theme : "dark") as ThemeId,
     font_size: (["s", "m", "l"].includes(p.font_size as string) ? p.font_size : "m") as "s" | "m" | "l",
+    show_verses: todayPref.verses !== false,
+    show_quotes: todayPref.quotes !== false,
     ai_provider: (ai.provider as string) ?? "openai",
     ai_model: (ai.model as string) ?? "",
     ai_has_key: !!ai.key,

@@ -40,7 +40,8 @@ Users can rename any app (stored in `app_settings.app_names`). IDs are fixed.
   - [ ] Quick-action cards: Visit Store, Watch the Journey (paid), Chat with Dev (paid), Life Stats
   - [ ] **Adjustable widget board** with **"Edit Layout" FAB** (FamilyLock style — drag/hide controls hidden until edit mode). Reorder + hide/show + (optional) resize, persisted to `app_settings`.
   - [ ] **Life Stats** widget (6 areas: Spiritual/Love/Work/Focus/Mind/Strength, RPG-style with levels). Placeholder values until source apps exist.
-  - [ ] Today View widget
+  - [x] Today View widget + **Inspirations engine (#3)**: default verses/quotes, daily rotation, admin editor (site_content), per-user verse/quote toggle in Settings
+  - [x] Theme conversion: dashboard chrome + widgets + store + settings use CSS-variable classes so Light/Void actually re-theme (not just the bg); layout tightened + horizontal-overflow fixed
 - [x] **Phase 3 — Gideon in the dashboard**
   - [x] Member-facing Gideon assistant (floating dock) wired into the dashboard
   - [ ] Real BYOK AI call (shared callAI adapter) — currently canned responses

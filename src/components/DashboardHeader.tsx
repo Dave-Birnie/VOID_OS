@@ -29,7 +29,7 @@ export function DashboardHeader({
   };
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-void-black/80 border-b border-zinc-800/80 py-3 px-4 md:px-6">
+    <header className="sticky top-0 z-40 backdrop-blur-md themed-surface border-b themed-border py-2.5 px-4 md:px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         <Link href="/dashboard" aria-label="VOID OS dashboard" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8">
@@ -48,13 +48,13 @@ export function DashboardHeader({
 
         <div className="flex items-center gap-2 md:gap-3">
           {isAdmin && <ModeSwitch />}
-          <span className="hidden md:inline text-xs font-mono text-zinc-400">{name}</span>
+          <span className="hidden md:inline text-xs font-mono themed-muted">{name}</span>
           <NotificationBell notifications={notifications} />
           <Link
             href="/dashboard/settings"
             title="Settings"
             aria-label="Settings"
-            className="p-2 rounded-xl border border-zinc-800 hover:border-void-purple/50 text-zinc-400 hover:text-white transition-all bg-black/30"
+            className="p-2 rounded-xl border themed-border themed-hover themed-muted hover:opacity-80 transition-all"
           >
             <Settings className="w-4 h-4" aria-hidden="true" />
           </Link>
@@ -62,7 +62,7 @@ export function DashboardHeader({
             href="/"
             title="View public site"
             aria-label="View public site"
-            className="p-2 rounded-xl border border-zinc-800 hover:border-void-purple/50 text-zinc-400 hover:text-white transition-all bg-black/30"
+            className="p-2 rounded-xl border themed-border themed-hover themed-muted hover:opacity-80 transition-all"
           >
             <Home className="w-4 h-4" aria-hidden="true" />
           </Link>
@@ -70,7 +70,7 @@ export function DashboardHeader({
             onClick={handleLogout}
             title="Sign out"
             aria-label="Sign out"
-            className="p-2 rounded-xl border border-zinc-800 hover:border-red-500/50 text-zinc-400 hover:text-red-400 transition-all bg-black/30"
+            className="p-2 rounded-xl border themed-border hover:border-red-500/50 themed-muted hover:text-red-400 transition-all"
           >
             <LogOut className="w-4 h-4" aria-hidden="true" />
           </button>

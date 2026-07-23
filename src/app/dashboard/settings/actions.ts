@@ -24,6 +24,26 @@ export async function saveAppearance(formData: FormData): Promise<SettingsResult
   return { ok: true };
 }
 
+// Toggle daily encouragement (verses / quotes) in the Today View.
+export async function saveTodayPrefs(formData: FormData): Promise<SettingsResult> {
+  const { user } = await getUserAndProfile();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const verses = formData.get("verses") === "on";
+  const quotes = formData.get("quotes") === "on";
+
+  const supabase = await createClient();
+  const { data } = await supabase.from("profiles").select("app_settings").eq("id", user.id).single();
+  const settings = (data?.app_settings as Record<string, unknown>) ?? {};
+  const { error } = await supabase
+    .from("profiles")
+    .update({ app_settings: { ...settings, today: { verses, quotes } } })
+    .eq("id", user.id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
 export async function saveAccount(formData: FormData): Promise<SettingsResult> {
   const { user } = await getUserAndProfile();
   if (!user) return { ok: false, error: "Not signed in." };

@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   HelpCircle,
   Inbox,
+  Sparkles,
 } from "lucide-react";
 
 interface AdminDashboardProps {
@@ -109,7 +110,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, transcript
         </div>
 
         {/* Backend section entry points */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           <Link
             href="/admin/blog"
             className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-gradient-to-r from-purple-950/40 to-cyan-950/30 border border-purple-500/30 hover:border-purple-500/60 transition-all"
@@ -138,6 +139,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, transcript
             <span>
               <span className="block text-sm font-bold text-white">Inbox</span>
               <span className="block text-[11px] text-zinc-400">Reply to member DMs</span>
+            </span>
+          </Link>
+          <Link
+            href="/admin/inspirations"
+            className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-gradient-to-r from-purple-950/40 to-cyan-950/30 border border-purple-500/30 hover:border-purple-500/60 transition-all"
+          >
+            <Sparkles className="w-5 h-5 text-void-purple flex-shrink-0" />
+            <span>
+              <span className="block text-sm font-bold text-white">Inspirations</span>
+              <span className="block text-[11px] text-zinc-400">Daily verses &amp; quotes</span>
             </span>
           </Link>
         </div>

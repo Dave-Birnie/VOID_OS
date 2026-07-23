@@ -36,7 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="min-h-screen flex flex-col font-sans selection:bg-void-purple selection:text-white">
       <ThemeSync theme={theme} />
       <DashboardHeader isAdmin={profile?.role === "admin"} name={name} notifications={notifications} />
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-6 py-8 md:py-12">{children}</main>
+      <main className="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 py-6">{children}</main>
       <DashboardGideon />
     </div>
   );
