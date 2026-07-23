@@ -98,9 +98,14 @@ export default async function DashboardPage() {
 
       {/* Grow VOID OS — referrals + achievements */}
       <section className="mb-10">
-        <h2 className="font-mono themed-accent text-[11px] font-bold tracking-[0.2em] uppercase mb-3">
-          <span className="themed-accent-2">//</span> Grow VOID OS
-        </h2>
+        <div className="flex items-center justify-between gap-4 mb-3">
+          <h2 className="font-mono themed-accent text-[11px] font-bold tracking-[0.2em] uppercase">
+            <span className="themed-accent-2">//</span> Grow VOID OS
+          </h2>
+          <Link href="/leaderboard" className="font-mono text-xs font-bold themed-accent hover:opacity-80 inline-flex items-center gap-1.5">
+            Leaderboard <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {referralCode && <ReferralCard code={referralCode} count={referralCount} baseUrl={siteConfig.url} />}
           <div className="themed-card border themed-border rounded-2xl p-5">

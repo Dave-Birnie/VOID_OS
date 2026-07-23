@@ -94,6 +94,7 @@ export async function saveProfile(formData: FormData): Promise<SettingsResult> {
     x_url: url("x_url"),
     github_url: url("github_url"),
     youtube_url: url("youtube_url"),
+    show_on_leaderboard: formData.get("show_on_leaderboard") === "on",
   };
 
   const supabase = await createClient();

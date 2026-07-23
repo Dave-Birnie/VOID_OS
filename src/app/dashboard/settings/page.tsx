@@ -12,7 +12,7 @@ export default async function SettingsPage() {
   const { data } = await supabase
     .from("profiles")
     .select(
-      "full_name, nickname, timezone, theme, font_size, app_settings, avatar_url, handle, tagline, bio, location, website_url, x_url, github_url, youtube_url, is_founding_backer"
+      "full_name, nickname, timezone, theme, font_size, app_settings, avatar_url, handle, tagline, bio, location, website_url, x_url, github_url, youtube_url, is_founding_backer, show_on_leaderboard"
     )
     .eq("id", user!.id)
     .single();
@@ -47,6 +47,7 @@ export default async function SettingsPage() {
     github_url: (p.github_url as string) ?? "",
     youtube_url: (p.youtube_url as string) ?? "",
     is_founding_backer: !!p.is_founding_backer,
+    show_on_leaderboard: p.show_on_leaderboard !== false,
   };
 
   return <SettingsClient initial={initial} profile={profile} userId={user!.id} />;
