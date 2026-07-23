@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/Avatar";
 import { BadgeList } from "@/components/BadgeList";
 import { statLevel } from "@/lib/lifeStats";
+import { referralStanding } from "@/lib/referralTiers";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +85,7 @@ export default async function PublicProfilePage({ params }: { params: { handle: 
   const name = p.full_name || `@${p.handle}`;
   const since = new Date(p.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" });
   const level = statLevel(p.life_score);
+  const tier = referralStanding(p.referral_count ?? 0).current;
 
   return (
     <main className="min-h-screen grid-bg">
@@ -112,11 +114,18 @@ export default async function PublicProfilePage({ params }: { params: { handle: 
             </div>
           </div>
 
-          {p.is_founding_backer && (
-            <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold">
-              <BadgeCheck className="w-3.5 h-3.5" /> Founding Backer
-            </div>
-          )}
+          <div className="mt-5 flex flex-wrap gap-2">
+            {p.is_founding_backer && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold">
+                <BadgeCheck className="w-3.5 h-3.5" /> Founding Backer
+              </div>
+            )}
+            {tier && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border themed-border themed-text text-xs font-bold">
+                <span>{tier.emoji}</span> {tier.name}
+              </div>
+            )}
+          </div>
 
           {p.bio && <p className="mt-5 text-sm themed-text leading-relaxed whitespace-pre-line">{p.bio}</p>}
 
